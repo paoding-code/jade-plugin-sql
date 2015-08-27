@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd  
+      http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+      http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config />
+
+    <bean id="dataSource"
+        class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="org.hsqldb.jdbc.JDBCDriver" />
+        <property name="url" value="jdbc:hsqldb:mem:jade_plugin_sql_db" />
+    </bean>
+
+    <bean
+        class="net.paoding.rose.jade.context.spring.JadeBeanFactoryPostProcessor" />
+
+    <bean class="net.paoding.rose.jade.plugin.sql.PlumSQLInterpreter">
+        <property name="dialect">
+            <bean
+                class="net.paoding.rose.jade.plugin.sql.dialect.MySQLDialect" />
+        </property>
+        <property name="operationMapperManager">
+            <bean
+                class="net.paoding.rose.jade.plugin.sql.mapper.OperationMapperManager">
+                <property name="entityMapperManager">
+                    <bean
+                        class="net.paoding.rose.jade.plugin.sql.mapper.EntityMapperManager" />
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+</beans>  
