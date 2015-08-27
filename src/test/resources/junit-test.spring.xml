@@ -15,20 +15,18 @@
         <property name="url" value="jdbc:hsqldb:mem:jade_plugin_sql_db" />
     </bean>
 
-    <bean
-        class="net.paoding.rose.jade.context.spring.JadeBeanFactoryPostProcessor" />
+    <!-- Jade -->
+    <bean class="net.paoding.rose.jade.context.spring.JadeBeanFactoryPostProcessor" />
 
+	<!-- Plum -->
     <bean class="net.paoding.rose.jade.plugin.sql.PlumSQLInterpreter">
         <property name="dialect">
-            <bean
-                class="net.paoding.rose.jade.plugin.sql.dialect.MySQLDialect" />
+            <bean class="net.paoding.rose.jade.plugin.sql.dialect.MySQLDialect" />
         </property>
         <property name="operationMapperManager">
-            <bean
-                class="net.paoding.rose.jade.plugin.sql.mapper.OperationMapperManager">
+            <bean class="net.paoding.rose.jade.plugin.sql.mapper.OperationMapperManager">
                 <property name="entityMapperManager">
-                    <bean
-                        class="net.paoding.rose.jade.plugin.sql.mapper.EntityMapperManager" />
+                    <bean class="net.paoding.rose.jade.plugin.sql.mapper.EntityMapperManager" />
                 </property>
             </bean>
         </property>
