@@ -23,13 +23,6 @@
         <property name="dialect">
             <bean class="net.paoding.rose.jade.plugin.sql.dialect.MySQLDialect" />
         </property>
-        <property name="operationMapperManager">
-            <bean class="net.paoding.rose.jade.plugin.sql.mapper.OperationMapperManager">
-                <property name="entityMapperManager">
-                    <bean class="net.paoding.rose.jade.plugin.sql.mapper.EntityMapperManager" />
-                </property>
-            </bean>
-        </property>
     </bean>
 
 </beans>  
