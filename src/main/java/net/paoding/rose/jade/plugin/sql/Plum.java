@@ -11,11 +11,6 @@ import net.paoding.rose.jade.plugin.sql.Order.Direction;
  */
 public class Plum {
 	
-	public static final String C = "INSERT @C";
-	public static final String R = "SELECT @R";
-	public static final String U = "UPDATE @U";
-	public static final String D = "DELETE @D";
-	
 	public static enum Operator {
 		
 		/**
