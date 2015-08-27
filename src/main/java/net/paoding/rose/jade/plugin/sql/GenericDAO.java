@@ -12,7 +12,7 @@ import net.paoding.rose.jade.annotation.SQLParam;
  * @author Alan.Geng[gengzhi718@gmail.com]
  *
  */
-public interface GenericDAO<E extends Entity, ID> {
+public interface GenericDAO<E, ID> {
 
     /**
      * 通过主键查询

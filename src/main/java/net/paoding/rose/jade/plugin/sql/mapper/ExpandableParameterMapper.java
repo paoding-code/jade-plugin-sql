@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.paoding.rose.jade.annotation.SQLParam;
-import net.paoding.rose.jade.plugin.sql.Entity;
 
 /**
  * @author Alan.Geng[gengzhi718@gmail.com]
@@ -19,7 +18,7 @@ public class ExpandableParameterMapper extends ParameterMapper implements IExpan
 	
 	private List<IParameterMapper> expendedParameters;
 
-	public ExpandableParameterMapper(SQLParam original, Class<? extends Entity> type) {
+	public ExpandableParameterMapper(SQLParam original, Class<?> type) {
 		super(original, type, null);
 	}
 
@@ -38,9 +37,8 @@ public class ExpandableParameterMapper extends ParameterMapper implements IExpan
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	protected void mapExpendedParameterMapper() throws Exception {
-		IEntityMapper entityMapper = entityMapperManager.createGet((Class<? extends Entity>) getType());
+		IEntityMapper entityMapper = entityMapperManager.createGet((Class<?>) getType());
 		if(entityMapper != null) {
 			List<IColumnMapper> columns = entityMapper.getColumns();
 			expendedParameters = new ArrayList<IParameterMapper>(columns.size());

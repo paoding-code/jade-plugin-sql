@@ -3,10 +3,10 @@
  */
 package net.paoding.rose.jade.plugin.sql.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import net.paoding.rose.jade.plugin.sql.Entity;
 import net.paoding.rose.jade.plugin.sql.Order.Direction;
 import net.paoding.rose.jade.plugin.sql.annotations.Column;
 import net.paoding.rose.jade.plugin.sql.annotations.Table;
@@ -20,7 +20,7 @@ import net.paoding.rose.jade.plugin.sql.annotations.Table;
  *  XxxDO中的DO不会被转换到表明映射中，即：UserInfoDO -> user_info。
  */
 @Table
-public class UserInfoDO implements Entity {
+public class UserInfoDO implements Serializable {
 
     /**
      * 

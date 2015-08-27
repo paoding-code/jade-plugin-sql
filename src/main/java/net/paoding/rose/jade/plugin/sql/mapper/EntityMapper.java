@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.paoding.rose.jade.plugin.sql.Entity;
 import net.paoding.rose.jade.plugin.sql.Order;
 import net.paoding.rose.jade.plugin.sql.Order.Direction;
 import net.paoding.rose.jade.plugin.sql.Plum;
@@ -21,7 +20,7 @@ import net.paoding.rose.jade.plugin.sql.util.MyLangUtils;
  * @author Alan.Geng[gengzhi718@gmail.com]
  *
  */
-public class EntityMapper extends AbstractMapper<Class<? extends Entity>> implements IEntityMapper {
+public class EntityMapper extends AbstractMapper<Class<?>> implements IEntityMapper {
 	
 	private List<IColumnMapper> columns;
 	
@@ -33,7 +32,7 @@ public class EntityMapper extends AbstractMapper<Class<? extends Entity>> implem
 	
 	private Order defaultOrder;
 	
-	public EntityMapper(Class<? extends Entity> from) {
+	public EntityMapper(Class<?> from) {
 		super(from);
 	}
 	

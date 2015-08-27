@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.List;
 
 import net.paoding.rose.jade.annotation.SQLParam;
-import net.paoding.rose.jade.plugin.sql.Entity;
 import net.paoding.rose.jade.plugin.sql.GenericDAO;
 import net.paoding.rose.jade.statement.StatementMetaData;
 
@@ -70,9 +69,8 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	protected void mapTargetEntityMapper() {
-		targetEntityMapper = entityMapperManager.createGet((Class<? extends Entity>) entityType);
+		targetEntityMapper = entityMapperManager.createGet((Class<?>) entityType);
 	}
 	
 	protected void mapParameters() {
@@ -111,12 +109,11 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 		return typeVariable.getBounds();
 	}
 	
-	@SuppressWarnings("unchecked")
 	protected IParameterMapper createParameterMapper(Class<?> type, Annotation[] annotations, int index) {
 		if(annotations != null && annotations.length > 0) {
 			for(Annotation annotation : annotations) {
 				if(annotation.annotationType().equals(SQLParam.class)) {
-					if(type == Entity.class) {
+					if(type == Object.class) {
 						type = entityType;
 					} else if(Collection.class.isAssignableFrom(type)) {
 						type = (Class<?>) getCollectionTypeBounds(type)[0];
@@ -127,7 +124,7 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 					
 					IParameterMapper param = null;
 					if(isExpandableParameterType(type)) {
-						param = new ExpandableParameterMapper((SQLParam) annotation, (Class<? extends Entity>) type);
+						param = new ExpandableParameterMapper((SQLParam) annotation, (Class<?>) type);
 						((ExpandableParameterMapper) param).setEntityMapperManager(entityMapperManager);
 					} else {
 						param = new ParameterMapper((SQLParam) annotation, type, annotations);
@@ -142,7 +139,7 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 	}
 	
 	protected boolean isExpandableParameterType(Class<?> type) {
-		if(Entity.class.isAssignableFrom(type)) {
+		if(entityType.isAssignableFrom(type)) {
 			return true;
 		}
 		return false;
