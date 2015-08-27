@@ -99,7 +99,7 @@ public interface UserDAO extends GenericDAO<UserDO, Long> {
 
 如此以来，我们从GenericDAO上继承得到了基本的CRUD操作，但这在日常的开发工作中显然不够满足需求，本插件提供了一系列的约定，让你仅仅在接口中声明出方法，即可获得该方法的实际功能。
 
-### 按制定字段查询：
+### 按指定字段查询：
 ```java
 	/**
 	 * 指定字段查询
