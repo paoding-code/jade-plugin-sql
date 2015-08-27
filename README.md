@@ -34,13 +34,6 @@ jade-plugin-sql是一个 paoding-rose-jade 插件。它能够根据 DAO 方法�
         <property name="dialect">
             <bean class="net.paoding.rose.jade.plugin.sql.dialect.MySQLDialect" />
         </property>
-        <property name="operationMapperManager">
-            <bean class="net.paoding.rose.jade.plugin.sql.mapper.OperationMapperManager">
-                <property name="entityMapperManager">
-                    <bean class="net.paoding.rose.jade.plugin.sql.mapper.EntityMapperManager" />
-                </property>
-            </bean>
-        </property>
     </bean>
 ```
 
