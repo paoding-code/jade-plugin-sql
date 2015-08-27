@@ -227,7 +227,6 @@ public interface UserDAO extends GenericDAO<UserDO, Long> {
 尽管提供了如此丰富的查询约定规则，但无论如何是满足不了所有需求的。此时，直接使用jade的原生方式吧
 
 ```java
-        @SQL("select id, name, cola, colb from my_table where xxxx")
+	@SQL("select id, name, cola, colb from my_table where xxxx")
 	public List<UserDAO> findWithSQL(xxxx);
-
 ```
