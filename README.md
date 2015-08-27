@@ -1,6 +1,9 @@
 # Welcome to `jade-plugin-sql`
 jade-plugin-sql是一个 paoding-rose-jade 插件。它能够根据 DAO 方法，自动生成 SQL 语句，减少手动拼写SQL工作量。
 
+（jade原生的@SQL方式和本插件使用的方式默认同时有效，互相不冲突）
+
+
 ## User Guide
 
 ### Maven Dependency
@@ -8,12 +11,12 @@ jade-plugin-sql是一个 paoding-rose-jade 插件。它能够根据 DAO 方法�
 <dependency>
 	<groupId>net.paoding</groupId>
 	<artifactId>jade-plugin-sql</artifactId>
-	<!-- Is a young boy! Hahaha~~ -->
+	<!-- It is a young boy! Hahaha~~ -->
 	<version>0.0.1-SNAPSHOT</version>
 </dependency>
 ```
 
-### 通过Spring配置Plum
+### 通过Spring配置jade-plugin-sql
 ```xml
     <context:annotation-config />
 
@@ -23,10 +26,10 @@ jade-plugin-sql是一个 paoding-rose-jade 插件。它能够根据 DAO 方法�
         <property name="url" value="jdbc:hsqldb:mem:jade_plugin_sql_db" />
     </bean>
 
-    <!-- Jade -->
+    <!-- 启用Jade配置 -->
     <bean class="net.paoding.rose.jade.context.spring.JadeBeanFactoryPostProcessor" />
 
-	  <!-- Plum -->
+    <!-- 启用jade-plugin-sql插件 -->
     <bean class="net.paoding.rose.jade.plugin.sql.PlumSQLInterpreter">
         <property name="dialect">
             <bean class="net.paoding.rose.jade.plugin.sql.dialect.MySQLDialect" />
@@ -60,7 +63,7 @@ public class UserDO implements Entity {
 	@Column(pk = true)
 	private Long id;
 	
-	// 完全符合规则的字段也必须声明Column，告诉Plum将其映射为表中的列。
+	// 完全符合规则的字段也必须声明Column，告诉插件将其映射为表中的列。
 	@Column
 	private String name;
 	
@@ -97,11 +100,11 @@ public class UserDO implements Entity {
  * spring框架将为之注入一个自动生成的实现。
  */
 @DAO
-public interface UserDAO extends GenericDAO<UserDO> {
+public interface UserDAO extends GenericDAO<UserDO, Long> {
 }
 ```
 
-如此以来，我们从GenericDAO上继承得到了基本的CRUD操作，但这在日常的开发工作中显然不够满足需求，Plum提供了一系列的约定，让你仅仅在接口中声明出方法，即可获得该方法的实际功能。
+如此以来，我们从GenericDAO上继承得到了基本的CRUD操作，但这在日常的开发工作中显然不够满足需求，本插件提供了一系列的约定，让你仅仅在接口中声明出方法，即可获得该方法的实际功能。
 
 ### 按制定字段查询：
 ```java
@@ -110,12 +113,11 @@ public interface UserDAO extends GenericDAO<UserDO> {
 	 * @param age
 	 * @return
 	 */
-	@SQL(Plum.R)
-	public List<UserDO> findByAge(
-			@SQLParam("age") Integer age);
+	// 无需@SQL注解手写sql语句，实际的SQL语句由jade-plugin-sql动态生成
+	public List<UserDO> findByAge(@SQLParam("age") Integer age);
 ```
 
-如上，当你定义了这样一个方法，Plum则会自动在该方法被调用时生成一条SQL，并执行它，自动封装为返回值指定的结果类型：
+如上，当你定义了这样一个方法，则会自动在该方法被调用时生成一条SQL，并执行它，自动封装为返回值指定的结果类型：
 ```sql
     SELECT
         id,
@@ -136,12 +138,10 @@ public interface UserDAO extends GenericDAO<UserDO> {
 ```java
 	/**
 	 * 字符串Like查询
-	 * @param name
+	 * @param name 传进来的name参数自己负责百分号的拼接，比如传入"zhang%"
 	 * @return
 	 */
-	@SQL(Plum.R)
-	public List<UserDO> findByName(
-			@SQLParam("name") @Like String name);
+	public List<UserDO> findByName(@SQLParam("name") @Like String name);
 ```
 
 ### 值区间查询：
@@ -152,8 +152,7 @@ public interface UserDAO extends GenericDAO<UserDO> {
 	 * @param max
 	 * @return
 	 */
-	@SQL(Plum.R)
-	public List<UserDO> findByAgeRegion(
+	public List<UserDO> findByAgeBwteen(
 			@SQLParam("age") @Ge Long min,
 			@SQLParam("age") @Le Long max);
 ```
@@ -166,14 +165,13 @@ public interface UserDAO extends GenericDAO<UserDO> {
 	 * @param order
 	 * @return
 	 */
-	@SQL(Plum.R)
-	public List<UserDO> findOrderBy(
+	public List<UserDO> findByNameLikeWithOrder(
 			@SQLParam("name") @Like String name,
 			Order order);
 ```
 我们也简单做了一些语法糖使Order对象的创建变得方便。
 ```java
-	userDAO.findOrderBy("Plum%", Plum.asc("name", "age").desc("createTime"));
+	userDAO.findByNameLikeWithOrder("Plum%", Plum.asc("name", "age").desc("createTime"));
 ```
 如上所示，该方法执行时，将自动生成SQL：
 ```sql
@@ -201,14 +199,13 @@ public interface UserDAO extends GenericDAO<UserDO> {
 	 * @param range
 	 * @return
 	 */
-	@SQL(Plum.R)
-	public List<UserDAO> findRange(
+	public List<UserDAO> findWithLimit(
 			@SQLParam("name") @Like String name,
 			@Offset Integer start,
 			@Limit Integer limit);
 ```
 ```java
-	userDAO.findRange("Plum%", 0, 2);
+	userDAO.findWithLimit("Plum%", 0, 2);
 ```
 ```sql
     SELECT
@@ -225,5 +222,12 @@ public interface UserDAO extends GenericDAO<UserDO> {
         create_time DESC
     LIMIT 0, 2
 ```
-你尽管记住几个Plum定义的，通俗易懂的Annotation，不用写一条SQL，即可完成单表操作90%以上的需求，在这里需要特别注意的是，`Plum中，你所指定的任何字段名，都需使用Class的属性名，数据库表列名不可使用。`
-尽管提供了如此丰富的查询约定规则，实际项目中也会出现各种各样多表关联查询的需求，Plum是无法支持的，请使用Jade原生的方式。
+你只要记住几个预定义的注解，不用写一条SQL，即可完成单表操作90%以上的需求，在这里需要特别注意的是，使用本插件时，`@SQLParam中的串应该是Bean的属性名，不能写成表的列名。` 例如:这是对的：@SQLParam("userName")；这是错的：@SQLParam("user_name")
+
+尽管提供了如此丰富的查询约定规则，但无论如何是满足不了所有需求的。此时，直接使用jade的原生方式吧
+
+```java
+        @SQL("select id, name, cola, colb from my_table where xxxx")
+	public List<UserDAO> findWithSQL(xxxx);
+
+```
