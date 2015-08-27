@@ -11,7 +11,7 @@ jade-plugin-sql是一个 paoding-rose-jade 插件。它能够根据 DAO 方法�
 <dependency>
 	<groupId>net.paoding</groupId>
 	<artifactId>jade-plugin-sql</artifactId>
-	<!-- It is a young boy! Hahaha~~ -->
+	<!-- A young boy! Hahaha~~ -->
 	<version>0.0.1-SNAPSHOT</version>
 </dependency>
 ```
@@ -179,6 +179,7 @@ public interface UserDAO extends GenericDAO<UserDO, Long> {
     WHERE
         name like :name 
     ORDER BY
+    	-- 当指定了排序条件时，将不会使用DO中的默认排序。
         name ASC,
         age ASC,
         create_time DESC
