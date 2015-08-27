@@ -6,9 +6,10 @@ jade-plugin-sql是一个 paoding-rose-jade 插件。它能够根据 DAO 方法�
 ### Maven Dependency
 ```xml
 <dependency>
-	<groupId>com.cainiao.cnd</groupId>
-	<artifactId>cnd-commons-jade-plugins</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<groupId>net.paoding</groupId>
+	<artifactId>jade-plugin-sql</artifactId>
+	<!-- Is a young boy! Hahaha~~ -->
+	<version>0.0.1-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -201,7 +202,7 @@ public interface UserDAO extends GenericDAO<UserDO> {
 	 * @return
 	 */
 	@SQL(Plum.R)
-	public List<PurchaseContractDO> findRange(
+	public List<UserDAO> findRange(
 			@SQLParam("name") @Like String name,
 			@Offset Integer start,
 			@Limit Integer limit);
