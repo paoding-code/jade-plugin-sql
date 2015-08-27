@@ -5,11 +5,13 @@ package net.paoding.rose.jade.plugin.sql;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 
 import net.paoding.rose.jade.annotation.SQL;
 import net.paoding.rose.jade.plugin.sql.dialect.IDialect;
+import net.paoding.rose.jade.plugin.sql.mapper.EntityMapperManager;
 import net.paoding.rose.jade.plugin.sql.mapper.IOperationMapper;
 import net.paoding.rose.jade.plugin.sql.mapper.OperationMapperManager;
 import net.paoding.rose.jade.plugin.sql.util.BasicSQLFormatter;
@@ -22,7 +24,7 @@ import net.paoding.rose.jade.statement.StatementRuntime;
  * @author Alan.Geng[gengzhi718@gmail.com]
  */
 @Order(-1)
-public class PlumSQLInterpreter implements Interpreter {
+public class PlumSQLInterpreter implements Interpreter, InitializingBean {
 
     private OperationMapperManager operationMapperManager;
 
@@ -60,5 +62,13 @@ public class PlumSQLInterpreter implements Interpreter {
     public void setOperationMapperManager(OperationMapperManager operationMapperManager) {
         this.operationMapperManager = operationMapperManager;
     }
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		if(operationMapperManager == null) {
+			operationMapperManager = new OperationMapperManager();
+			operationMapperManager.setEntityMapperManager(new EntityMapperManager());
+		}
+	}
 
 }
