@@ -45,7 +45,7 @@ jade-plugin-sql是一个 paoding-rose-jade 插件。它能够根据 DAO 方法�
  *  XxxDO中的DO不会被转换到表明映射中，即：UserDO -> user。
  */
 @Table
-public class UserDO implements Entity {
+public class UserDO implements Serializable {
 
 	/**
 	 * 
