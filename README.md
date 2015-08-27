@@ -235,7 +235,11 @@ public interface UserDAO extends GenericDAO<UserDO, Long> {
 
 `上述的内容不同的数据库需要在方言中实现，默认给出MySQL的实现。`
 
-你只要记住几个预定义的注解，不用写一条SQL，即可完成单表操作90%以上的需求，在这里需要特别注意的是，使用本插件时，`@SQLParam中的串应该是Bean的属性名，不能写成表的列名。` 例如:这是对的：@SQLParam("userName")；这是错的：@SQLParam("user_name")
+你只要记住几个预定义的注解，不用写一条SQL，即可完成单表操作90%以上的需求，在这里需要特别注意的是，使用本插件时，`@SQLParam中的串应该是Bean的属性名，不能写成表的列名。` 例如:
+
+这是对的：@SQLParam("userName")；
+
+这是错的：@SQLParam("user_name")
 
 尽管提供了如此丰富的查询约定规则，但无论如何是满足不了所有需求的。此时，直接使用jade的原生方式吧：
 
