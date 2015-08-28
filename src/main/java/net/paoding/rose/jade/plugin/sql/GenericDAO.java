@@ -18,7 +18,7 @@ public interface GenericDAO<E, ID> {
      * 通过主键查询
      * @param id
      */
-    E get(@SQLParam("id") ID id);
+    E get(ID id);
 
     /**
      * 保存实体对象
@@ -47,5 +47,5 @@ public interface GenericDAO<E, ID> {
      * 物理删除实体
      * @param id
      */
-    boolean delete(@SQLParam("id") ID id);
+    boolean delete(ID id);
 }

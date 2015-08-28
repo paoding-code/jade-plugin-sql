@@ -3,7 +3,8 @@
  */
 package net.paoding.rose.jade.plugin.sql.mapper;
 
-import net.paoding.rose.jade.annotation.SQLType;
+import java.lang.reflect.Method;
+
 import net.paoding.rose.jade.statement.StatementMetaData;
 
 /**
@@ -13,20 +14,31 @@ import net.paoding.rose.jade.statement.StatementMetaData;
 public class OperationMapperManager extends AbstractCachedMapperManager<StatementMetaData, IOperationMapper> {
 	
 	private EntityMapperManager entityMapperManager;
+	
+	private static final String[] INSERT_PREFIX = IOperationMapper.OPERATION_PREFIX[1];
 
 	@Override
 	public IOperationMapper create(StatementMetaData source) {
 		IOperationMapper mapper = null;
 		
-		if(source.getSQLType() == SQLType.READ) {
-			mapper = new ConditionalOperationMapper(source);
-		} else {
+		if(isInsert(source.getMethod())) {
 			mapper = new OperationMapper(source);
+		} else {
+			mapper = new ConditionalOperationMapper(source);
 		}
 		
 		mapper.setEntityMapperManager(entityMapperManager);
 		mapper.map();
 		return mapper;
+	}
+	
+	private boolean isInsert(Method method) {
+		for(String prefix : INSERT_PREFIX) {
+			if(method.getName().startsWith(prefix)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void setEntityMapperManager(EntityMapperManager entityMapperManager) {

@@ -18,6 +18,20 @@ public interface IOperationMapper extends IMapper<StatementMetaData> {
 	public static final String OPERATION_DELETE = "DELETE";
 	public static final String OPERATION_UPDATE = "UPDATE";
 	
+	static final String[] OPERATION_KEYS = {
+		OPERATION_SELECT,
+		OPERATION_INSERT,
+		OPERATION_DELETE,
+		OPERATION_UPDATE
+	};
+	
+	static final String OPERATION_PREFIX[][] = {
+		{"get", "find"},
+		{"save", "insert"},
+		{"delete", "remove"},
+		{"update"}
+	};
+	
 	IEntityMapper getTargetEntityMapper();
 	
 	List<IParameterMapper> getParameters();

@@ -11,6 +11,7 @@ import java.util.Map;
 import net.paoding.rose.jade.plugin.sql.Plum.Operator;
 import net.paoding.rose.jade.plugin.sql.dialect.ISQLGenerator;
 import net.paoding.rose.jade.plugin.sql.mapper.ConditionalOperationMapper;
+import net.paoding.rose.jade.plugin.sql.mapper.IColumnMapper;
 import net.paoding.rose.jade.plugin.sql.mapper.IParameterMapper;
 import net.paoding.rose.jade.plugin.sql.util.MyLangUtils;
 import net.paoding.rose.jade.statement.StatementRuntime;
@@ -45,17 +46,38 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 	}
 	
 	protected void applyConditions(ConditionalOperationMapper operationMapper, StatementRuntime runtime, StringBuilder sql) {
-		List<IParameterMapper> parameters = operationMapper.getParameters();
-		if(MyLangUtils.isNotEmpty(parameters)) {
+		if(operationMapper.isPrimaryKeyConditionMode()) {
 			sql.append(" WHERE ");
+			List<IColumnMapper> primaryKey = operationMapper.getTargetEntityMapper().getPrimaryKey();
 			
-			for(int i = 0; i < parameters.size(); i++) {
-				IParameterMapper param = parameters.get(i);
+			for(int i = 0; i < primaryKey.size(); i++) {
+				IColumnMapper col = primaryKey.get(i);
 				if(i > 0) {
 					sql.append(" AND ");
 				}
-				applyCondition(param, runtime, i, sql);
+				
+				sql.append(col.getName());
+				sql.append(" = ");
+				sql.append(":");
+				
+				// TODO:当实体为符合主键并且参数列表中的顺序与实体中字段顺序不一致，则会发生错误。
+				sql.append(i + 1);
 			}
+		} else if(operationMapper.isComplexConditionMode()) {
+			List<IParameterMapper> parameters = operationMapper.getParameters();
+			if(MyLangUtils.isNotEmpty(parameters)) {
+				sql.append(" WHERE ");
+				
+				for(int i = 0; i < parameters.size(); i++) {
+					IParameterMapper param = parameters.get(i);
+					if(i > 0) {
+						sql.append(" AND ");
+					}
+					applyCondition(param, runtime, i, sql);
+				}
+			}
+		} else {
+			throw new UnsupportedOperationException("Unknown condition mode.");
 		}
 	}
 	

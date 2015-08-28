@@ -30,21 +30,9 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 	
 	private Class<?> entityType;
 	
+	private Class<?> primaryKeyType;
+	
 	public static final List<IParameterMapper> NO_PARAMETER = Collections.unmodifiableList(new ArrayList<IParameterMapper>());
-	
-	public static final String[] OPERATION_KEYS = {
-		OPERATION_SELECT,
-		OPERATION_INSERT,
-		OPERATION_DELETE,
-		OPERATION_UPDATE
-	};
-	
-	public static final String OPERATION_PREFIX[][] = {
-		{"get", "find"},
-		{"save", "insert"},
-		{"delete", "remove"},
-		{"update"}
-	};
 	
 	public OperationMapper(StatementMetaData original) {
 		super(original);
@@ -64,6 +52,7 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 	
 	protected void mapGenericEntityType() {
 		entityType = original.getDAOMetaData().resolveTypeVariable(GenericDAO.class, "E");
+		primaryKeyType = original.getDAOMetaData().resolveTypeVariable(GenericDAO.class, "ID");
 		if(entityType == null) {
 			throw new MappingException("Cannot find the generic type.");
 		}
@@ -81,18 +70,22 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 		if(parameterAnnotations == null
 				|| parameterAnnotations.length == 0) {
 			parameters = NO_PARAMETER;
+			
+			if((getName() == OPERATION_INSERT
+					|| getName() == OPERATION_DELETE
+					|| getName() == OPERATION_UPDATE)
+					&& parameters == NO_PARAMETER) {
+				// 写操作必须存在参数
+				throw new MappingException("The insert operation must has least 1 parameters.");
+			}
+
 			return;
-		}
-		
-		if(getName() == OPERATION_INSERT
-				&& parameters == NO_PARAMETER) {
-			throw new MappingException("The insert operation must has least 1 parameters.");
 		}
 		
 		parameters = new ArrayList<IParameterMapper>(parameterAnnotations.length);
 		
 		for(int i = 0; i < parameterAnnotations.length; i++) {
-			// TODO: Check the parameter type.
+			// TODO: 是否要进行参数类型检查？
 			IParameterMapper parameterMapper = createParameterMapper(parameterTypes[i], parameterAnnotations[i], i);
 			if(parameterMapper != null) {
 				parameters.add(parameterMapper);
@@ -175,6 +168,10 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 	@Override
 	public List<IParameterMapper> getParameters() {
 		return parameters;
+	}
+
+	public Class<?> getPrimaryKeyType() {
+		return primaryKeyType;
 	}
 	
 }
