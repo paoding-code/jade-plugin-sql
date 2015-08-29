@@ -44,6 +44,9 @@ public class ConditionalOperationMapper extends OperationMapper {
 				// 仅有一个参数，并且类型为泛型规定的主键类型，则视为主键条件模式。
 				appendMode(CONDITION_MODE_PRIMARY_KEY);
 				return;
+			} else if(getEntityType().isAssignableFrom(paramType)) {
+				appendMode(CONDITION_MODE_ENTITY);
+				return;
 			}
 		}
 		super.mapParameters();
@@ -134,11 +137,15 @@ public class ConditionalOperationMapper extends OperationMapper {
 	}
 	
 	public boolean isPrimaryKeyConditionMode() {
-		return mode == CONDITION_MODE_PRIMARY_KEY;
+		return isSpecifiedMode(CONDITION_MODE_PRIMARY_KEY);
 	}
 	
 	public boolean isComplexConditionMode() {
-		return mode == CONDITION_MODE_COMPLEX;
+		return isSpecifiedMode(CONDITION_MODE_COMPLEX);
+	}
+	
+	private boolean isSpecifiedMode(long mode) {
+		return (this.mode & mode) == mode;
 	}
 	
 }

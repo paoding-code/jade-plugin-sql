@@ -173,5 +173,9 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 	public Class<?> getPrimaryKeyType() {
 		return primaryKeyType;
 	}
+
+	public Class<?> getEntityType() {
+		return entityType;
+	}
 	
 }
