@@ -13,6 +13,8 @@ public interface IMapper<O> {
 	
 	void map();
 	
+	String getOriginalName();
+	
 	String getName();
 	
 }

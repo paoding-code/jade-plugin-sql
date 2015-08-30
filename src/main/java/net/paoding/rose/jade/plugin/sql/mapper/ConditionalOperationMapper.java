@@ -5,6 +5,8 @@ package net.paoding.rose.jade.plugin.sql.mapper;
 
 import java.lang.annotation.Annotation;
 
+import org.hsqldb.lib.Collection;
+
 import net.paoding.rose.jade.plugin.sql.Order;
 import net.paoding.rose.jade.plugin.sql.annotations.Limit;
 import net.paoding.rose.jade.plugin.sql.annotations.Offset;
@@ -36,23 +38,6 @@ public class ConditionalOperationMapper extends OperationMapper {
 		super(original);
 	}
 	
-	@Override
-	protected void mapParameters() {
-		if(original.getMethod().getParameterCount() == 1) {
-			Class<?> paramType = original.getMethod().getParameterTypes()[0];
-			if(getPrimaryKeyType().isAssignableFrom(paramType)) {
-				// 仅有一个参数，并且类型为泛型规定的主键类型，则视为主键条件模式。
-				appendMode(CONDITION_MODE_PRIMARY_KEY);
-				return;
-			} else if(getEntityType().isAssignableFrom(paramType)) {
-				appendMode(CONDITION_MODE_ENTITY);
-				return;
-			}
-		}
-		super.mapParameters();
-		appendMode(CONDITION_MODE_COMPLEX);
-	}
-	
 	private void appendMode(long append) {
 		mode = mode | append;
 	}
@@ -60,9 +45,12 @@ public class ConditionalOperationMapper extends OperationMapper {
 	@Override
 	protected IParameterMapper createParameterMapper(Class<?> type, Annotation[] annotations, int index) {
 		if(Order.class.isAssignableFrom(type)) {
+			// Order类型的参数仅记录其在参数列表中的位置，在查询操作的切面中，通过位置获取其实际的值。
 			orderParameterIndex = index;
 			return null;
-		} else {
+		}
+		
+		if(annotations.length > 0){
 			for(int i = 0; i < annotations.length; i++) {
 				Annotation annotation = annotations[i];
 				if(annotation.annotationType() == Offset.class) {
@@ -87,16 +75,36 @@ public class ConditionalOperationMapper extends OperationMapper {
 						throw new MappingException("The offset parameter must be int, long or Number.");
 					}
 					limitParameterIndex = index;
-				} else if(annotation.annotationType() == Where.class) {
-					// where条件的位置，用于update。
+				} else if(annotation.annotationType() == Where.class
+						&& OPERATION_UPDATE.equals(getName())) {
+					// Where条件的位置，用于更新操作，其他操作该注解无任何意义。
 					if(index == 0) {
-						throw new MappingException("The annotation \"Where\" can not appear at the first parameter.");
+						// 如果该注解被标记在第一个参数前，证明该操作没有任何值用于更新。
+						throw new MappingException("When update operation, the annotation \"Where\" cannot appear before at first parameter.");
 					}
 					whereAt = index;
 				}
+				appendMode(CONDITION_MODE_COMPLEX);
+			}
+		} else if(original.getMethod().getParameterTypes().length == 1) {
+			// 不存在任何Annotation，参数列表中仅有一个参数。
+			if(getPrimaryKeyType().isAssignableFrom(type)) {
+				// 类型为泛型中的主键类型
+				appendMode(CONDITION_MODE_PRIMARY_KEY);
+			} else if(getEntityType().isAssignableFrom(type)) {
+				if(Collection.class.isAssignableFrom(original.getMethod().getParameterTypes()[index])) {
+					// 实际类型为集合
+					appendMode(CONDITION_MODE_ENTITY_COLLECTION);
+				} else {
+					// 类型为泛型中的实体类型
+					appendMode(CONDITION_MODE_ENTITY);
+				}
 			}
 		}
+		
 		return super.createParameterMapper(type, annotations, index);
+		
+		// :) Have to say, [Casablanca - Bertie Higgins] very nice!
 	}
 	
 	@Override

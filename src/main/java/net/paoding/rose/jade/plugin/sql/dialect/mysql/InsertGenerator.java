@@ -43,16 +43,18 @@ public class InsertGenerator implements ISQLGenerator<OperationMapper> {
 		if(entityParam instanceof IExpandableParameterMapper) {
 			List<IParameterMapper> expandParams = ((IExpandableParameterMapper) entityParam).expand();
 			StringBuilder sql = new StringBuilder("INSERT INTO ");
-			StringBuilder values = new StringBuilder("");
+			StringBuilder values = new StringBuilder();
 			sql.append(targetEntityMapper.getName());
 			sql.append("(");
 			
 			for(IParameterMapper param : expandParams) {
-				sql.append(param.getName());
+				sql.append(param.getColumnMapper().getName());
 				sql.append(",");
 				
 				values.append(":");
-				values.append(param.getOriginalName());
+				values.append(entityParam.getName());
+				values.append(".");
+				values.append(param.getColumnMapper().getOriginalName());
 				values.append(",");
 			}
 			sql.setLength(sql.length() - 1);
@@ -64,7 +66,7 @@ public class InsertGenerator implements ISQLGenerator<OperationMapper> {
 			
 			return sql.toString();
 		} else {
-			throw new IllegalArgumentException("Parameter \"" + entityParam.getOriginal().value() + "\" cannot expend.");
+			throw new IllegalArgumentException("Parameter \"" + entityParam.getOriginalName() + "\" cannot expend.");
 		}
 	}
 

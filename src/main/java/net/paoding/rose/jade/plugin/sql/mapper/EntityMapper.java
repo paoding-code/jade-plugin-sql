@@ -88,7 +88,7 @@ public class EntityMapper extends AbstractMapper<Class<?>> implements IEntityMap
 	}
 
 	@Override
-	protected String getNameSource() {
+	protected String generateOriginalName() {
 		String name = original.getSimpleName();
 		if(name.endsWith(DATA_OBJECT_EXTENSION)) {
 			name = name.substring(0, name.length() - 2);

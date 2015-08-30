@@ -35,7 +35,7 @@ public interface GenericDAO<E, ID> {
      * 
      * @return 是否更新成功（实现原理：true=如果本次执行影响的行数大于0） 
      */
-    boolean save(@SQLParam("entity") List<E> entity);
+    boolean save(@SQLParam("entities") List<E> entity);
 
     /**
      * 更新实体

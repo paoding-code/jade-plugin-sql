@@ -15,6 +15,8 @@ public abstract class AbstractMapper<O> implements IMapper<O> {
 	
 	private String name;
 	
+	private String originalName;
+	
 	private boolean mapped;
 	
 	public static final char SEPARATOR = '_';
@@ -26,7 +28,8 @@ public abstract class AbstractMapper<O> implements IMapper<O> {
 	@Override
 	public void map() {
 		if(!mapped) {
-			this.name = generateName(getNameSource());
+			this.originalName = generateOriginalName();
+			this.name = generateName(getOriginalName());
 			doMap();
 			mapped = true;
 		}
@@ -34,6 +37,14 @@ public abstract class AbstractMapper<O> implements IMapper<O> {
 	
 	public O getOriginal() {
 		return original;
+	}
+	
+	public String getOriginalName() {
+		return originalName;
+	}
+	
+	protected String generateOriginalName() {
+		return original.toString();
 	}
 	
 	public String generateName(String source) {
@@ -66,8 +77,6 @@ public abstract class AbstractMapper<O> implements IMapper<O> {
 			throw new IllegalArgumentException("Illegal naming conventions.");
 		}
 	}
-	
-	protected abstract String getNameSource();
 	
 	protected void doMap() {
 		

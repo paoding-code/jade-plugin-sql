@@ -68,12 +68,22 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 			if(MyLangUtils.isNotEmpty(parameters)) {
 				sql.append(" WHERE ");
 				
-				for(int i = 0; i < parameters.size(); i++) {
+				int i = operationMapper.getWhereAt();
+				if(i < 0) {
+					// 无任何参数被标记为Where，则视为所有参数都是Where条件。
+					i = 0;
+				}
+				
+				String and = "";
+				for(; i < parameters.size(); i++) {
 					IParameterMapper param = parameters.get(i);
-					if(i > 0) {
-						sql.append(" AND ");
+					String condition = generateCondition(param, runtime, i);
+					
+					if(condition != null) {
+						sql.append(and);
+						sql.append(condition);
+						and = " AND ";
 					}
-					applyCondition(param, runtime, i, sql);
 				}
 			}
 		} else {
@@ -81,12 +91,19 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 		}
 	}
 	
-	protected void applyCondition(IParameterMapper param, StatementRuntime runtime, int index, StringBuilder sql) {
-		sql.append(param.getName());
-		
+	protected String generateCondition(IParameterMapper param, StatementRuntime runtime, int index) {
 		Operator op = param.getOperator();
+		
+		if(!OPERATORS.containsKey(op)) {
+			return null;
+		}
+		
+		StringBuilder sql = new StringBuilder();
+		
+		sql.append(param.getName());
 		sql.append(OPERATORS.get(op));
 		sql.append(":");
+		
 		
 		if(op != Operator.LIKE && op != Operator.EQ) {
 			// Multiple parameter value at the same column.(e.g. age >= 15 AND age < 22)
@@ -94,8 +111,10 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 			sql.append(index + 1);
 		} else {
 			// Normally, the "like" and "=" condition only once at the same column.
-			sql.append(param.getOriginal().value());
+			sql.append(param.getOriginalName());
 		}
+		
+		return sql.toString();
 	}
 	
 	protected void beforeApplyConditions(ConditionalOperationMapper operationMapper, StatementRuntime runtime, StringBuilder sql) {

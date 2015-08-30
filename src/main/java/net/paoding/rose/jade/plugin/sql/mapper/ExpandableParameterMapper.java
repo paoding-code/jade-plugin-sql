@@ -23,11 +23,6 @@ public class ExpandableParameterMapper extends ParameterMapper implements IExpan
 	}
 
 	@Override
-	protected String getNameSource() {
-		return original.value();
-	}
-
-	@Override
 	public void doMap() {
 		super.doMap();
 		try {

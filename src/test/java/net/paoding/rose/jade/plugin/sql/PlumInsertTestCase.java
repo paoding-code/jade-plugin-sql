@@ -43,7 +43,6 @@ public class PlumInsertTestCase extends AbstractTestCase {
 		userInfoDAO.save(userInfos);
 	}
 	
-
     private static UserInfoDO createUserInfoDO(long group, int age) {
         UserInfoDO userInfo = new UserInfoDO();
 

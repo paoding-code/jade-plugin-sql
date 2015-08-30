@@ -23,19 +23,13 @@ import net.paoding.rose.jade.plugin.sql.annotations.Offset;
  * @author Alan.Geng[gengzhi718@gmail.com]
  *
  */
-public class ParameterMapper extends AbstractMapper<SQLParam> implements IParameterMapper {
+public class ParameterMapper extends AbstractMapper<ParameterOriginal> implements IParameterMapper {
 	
 	private IParameterMapper parent;
 	
 	private IColumnMapper columnMapper;
 	
-	private String originalName;
-	
-	private Class<?> type;
-	
 	private Operator operator = Operator.EQ;
-	
-	private Annotation[] annotations;
 	
 	private static final Map<Class<? extends Annotation>, Operator> OPERATORS;
 	
@@ -57,22 +51,19 @@ public class ParameterMapper extends AbstractMapper<SQLParam> implements IParame
 	}
 
 	public ParameterMapper(IParameterMapper parent, IColumnMapper columnMapper) {
-		super(parent.getOriginal());
+		super(new ParameterOriginal(null, columnMapper.getOriginal().getType(), null));
 		this.parent = parent;
 		this.columnMapper = columnMapper;
-		originalName = parent.getOriginal().value() + "." + columnMapper.getOriginal().getName();
 	}
 	
 	public ParameterMapper(SQLParam original, Class<?> type, Annotation[] annotations) {
-		super(original);
-		this.type = type;
-		originalName = original.value();
-		this.annotations = annotations;
+		super(new ParameterOriginal(original, type, annotations));
 	}
 	
 	@Override
 	protected void doMap() {
 		super.doMap();
+		Annotation[] annotations = original.getAnnotations();
 		if(annotations != null && annotations.length > 0) {
 			for(Annotation annotation : annotations) {
 				Operator operator = OPERATORS.get(annotation.annotationType());
@@ -86,35 +77,15 @@ public class ParameterMapper extends AbstractMapper<SQLParam> implements IParame
 
 	@Override
 	public Class<?> getType() {
-		if(parent == null) {
-			return type;
-		} else {
-			return columnMapper.getOriginal().getType();
-		}
+		return original.getType();
 	}
 
 	@Override
-	protected String getNameSource() {
-		if(parent == null) {
-			return original.value();
-		} else {
-			return null;
-		}
+	protected String generateOriginalName() {
+		return original.getName();
 	}
 	
 	@Override
-	public String getName() {
-		if(parent == null) {
-			return super.getName();
-		} else {
-			return columnMapper.getName();
-		}
-	}
-	
-	public String getOriginalName() {
-		return originalName;
-	}
-	
 	public IParameterMapper getParent() {
 		return parent;
 	}
@@ -126,5 +97,5 @@ public class ParameterMapper extends AbstractMapper<SQLParam> implements IParame
 	public Operator getOperator() {
 		return operator;
 	}
-
+	
 }

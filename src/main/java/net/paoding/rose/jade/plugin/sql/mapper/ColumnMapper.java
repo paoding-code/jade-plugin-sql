@@ -26,7 +26,7 @@ public class ColumnMapper extends AbstractMapper<Field> implements IColumnMapper
 	}
 
 	@Override
-	protected String getNameSource() {
+	protected String generateOriginalName() {
 		return original.getName();
 	}
 	

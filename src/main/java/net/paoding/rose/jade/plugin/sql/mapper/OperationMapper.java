@@ -4,7 +4,9 @@
 package net.paoding.rose.jade.plugin.sql.mapper;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
@@ -64,11 +66,11 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 	
 	protected void mapParameters() {
 		Method method = original.getMethod();
-		Class<?>[] parameterTypes = method.getParameterTypes();
+		Type[] parameterTypes = method.getGenericParameterTypes();
 		Annotation[][] parameterAnnotations = method.getParameterAnnotations();
 		
-		if(parameterAnnotations == null
-				|| parameterAnnotations.length == 0) {
+		if(parameterTypes == null
+				|| parameterTypes.length == 0) {
 			parameters = NO_PARAMETER;
 			
 			if((getName() == OPERATION_INSERT
@@ -86,11 +88,46 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 		
 		for(int i = 0; i < parameterAnnotations.length; i++) {
 			// TODO: 是否要进行参数类型检查？
-			IParameterMapper parameterMapper = createParameterMapper(parameterTypes[i], parameterAnnotations[i], i);
+			IParameterMapper parameterMapper = createParameterMapper(resolveParameterType(parameterTypes[i]), parameterAnnotations[i], i);
 			if(parameterMapper != null) {
 				parameters.add(parameterMapper);
 			}
 		}
+	}
+	
+	protected Class<?> resolveParameterType(Type type) {
+		if(type instanceof Class) {
+			return (Class<?>) type;
+		} else if(type instanceof ParameterizedType
+				&& ((ParameterizedType) type).getRawType() instanceof Class
+				&& Collection.class.isAssignableFrom((Class<?>) ((ParameterizedType) type).getRawType())) {
+			
+			// GenericDAO中的集合泛型参数
+			return resolveParameterType(((ParameterizedType) type).getActualTypeArguments()[0]);
+		} else if(type instanceof TypeVariable) {
+			
+			// GenericDAO中的非集合泛型参数，或许是主键或许是实体。
+			GenericDeclaration genericDeclaration = ((TypeVariable<?>) type).getGenericDeclaration();
+			if(genericDeclaration == GenericDAO.class) {
+				Type[] bounds = ((TypeVariable<?>) type).getBounds();
+				
+				if(bounds[0] == Object.class) {
+					String name = ((TypeVariable<?>) type).getName();
+					if("E".equals(name)) {
+						return entityType;
+					} else if("ID".equals(name)) {
+						return primaryKeyType;
+					} else {
+						throw new MappingException("Unknown type variable \"" + type + "\".");
+					}
+				} else {
+					return resolveParameterType(bounds[0]);
+				}
+			} else {
+				throw new MappingException("Unsupported generic declaration \"" + genericDeclaration + "\".");
+			}
+		}
+		throw new MappingException("Unknown type \"" + type + "\".");
 	}
 	
 	protected Type[] getCollectionTypeBounds(Class<?> collectionType) {
@@ -103,32 +140,28 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 	}
 	
 	protected IParameterMapper createParameterMapper(Class<?> type, Annotation[] annotations, int index) {
+		SQLParam sp = null;
+		
 		if(annotations != null && annotations.length > 0) {
 			for(Annotation annotation : annotations) {
 				if(annotation.annotationType().equals(SQLParam.class)) {
-					if(type == Object.class) {
-						type = entityType;
-					} else if(Collection.class.isAssignableFrom(type)) {
-						type = (Class<?>) getCollectionTypeBounds(type)[0];
-						if(type == Object.class) {
-							type = entityType;
-						}
-					}
-					
-					IParameterMapper param = null;
-					if(isExpandableParameterType(type)) {
-						param = new ExpandableParameterMapper((SQLParam) annotation, (Class<?>) type);
-						((ExpandableParameterMapper) param).setEntityMapperManager(entityMapperManager);
-					} else {
-						param = new ParameterMapper((SQLParam) annotation, type, annotations);
-					}
-					
-					param.map();
-					return param;
+					sp = (SQLParam) annotation;
+					break;
 				}
 			}
+			
 		}
-		return null;
+		
+		IParameterMapper param = null;
+		if(isExpandableParameterType(type)) {
+			param = new ExpandableParameterMapper(sp, (Class<?>) type);
+			((ExpandableParameterMapper) param).setEntityMapperManager(entityMapperManager);
+		} else {
+			param = new ParameterMapper(sp, type, annotations);
+		}
+		param.map();
+		
+		return param;
 	}
 	
 	protected boolean isExpandableParameterType(Class<?> type) {
@@ -144,7 +177,7 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 	}
 
 	@Override
-	protected String getNameSource() {
+	protected String generateOriginalName() {
 		return original.getMethod().getName();
 	}
 	
