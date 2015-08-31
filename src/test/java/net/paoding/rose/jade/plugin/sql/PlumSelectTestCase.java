@@ -3,6 +3,7 @@
  */
 package net.paoding.rose.jade.plugin.sql;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,16 @@ public class PlumSelectTestCase extends AbstractTestCase {
 	
 	public void testGetRange() {
 		List<UserInfoDO> userInfos = userInfoDAO.findByNameWithLimit("耿%", 0, 2);
+		
+		System.out.println(JSON.toJSONString(userInfos, SerializerFeature.PrettyFormat));
+	}
+	
+	public void testFindByGroupIds() {
+		List<Integer> groupIds = new ArrayList<Integer>();
+		groupIds.add(100);
+		groupIds.add(101);
+		
+		List<UserInfoDO> userInfos = userInfoDAO.findByGroupIds(groupIds);
 		
 		System.out.println(JSON.toJSONString(userInfos, SerializerFeature.PrettyFormat));
 	}

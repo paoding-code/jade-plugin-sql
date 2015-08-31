@@ -10,6 +10,7 @@ import net.paoding.rose.jade.annotation.SQLParam;
 import net.paoding.rose.jade.plugin.sql.GenericDAO;
 import net.paoding.rose.jade.plugin.sql.Order;
 import net.paoding.rose.jade.plugin.sql.annotations.Ge;
+import net.paoding.rose.jade.plugin.sql.annotations.In;
 import net.paoding.rose.jade.plugin.sql.annotations.Le;
 import net.paoding.rose.jade.plugin.sql.annotations.Like;
 import net.paoding.rose.jade.plugin.sql.annotations.Limit;
@@ -79,6 +80,14 @@ public interface UserInfoDAO extends GenericDAO<UserInfoDO, Long> {
 			@Limit int limit);
 	
 	/**
+	 * In查询
+	 * @param groupIds
+	 * @return
+	 */
+	public List<UserInfoDO> findByGroupIds(
+			@SQLParam("groupId") @In List<Integer> groupIds);
+	
+	/**
 	 * 通过指定字段条件更新
 	 * @param name
 	 * @param group
@@ -88,4 +97,15 @@ public interface UserInfoDAO extends GenericDAO<UserInfoDO, Long> {
 			@SQLParam("age") int age,
 			@Where
 			@SQLParam("groupId") Integer group);
+	
+	/**
+	 * 通过指定字段条件更新
+	 * @param name
+	 * @param group
+	 */
+	public void updateByGroupIds(
+			@SQLParam("name") String name,
+			@SQLParam("age") int age,
+			@Where
+			@SQLParam("groupId") @In List<Integer> group);
 }

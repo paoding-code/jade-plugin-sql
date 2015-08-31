@@ -3,6 +3,7 @@
  */
 package net.paoding.rose.jade.plugin.sql;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -40,6 +41,17 @@ public class PlumUpdateTestCase extends AbstractTestCase {
 		purchaseContractDAO.updateByGroup("Alan.Geng", 29, 100);
 		
 		List<UserInfoDO> updated = purchaseContractDAO.findByGroupId(100);
+		System.out.println(JSON.toJSONString(updated, SerializerFeature.PrettyFormat));
+	}
+	
+	public void testSpecialInUpdate() {
+		List<Integer> groupIds = new ArrayList<Integer>();
+		groupIds.add(100);
+		groupIds.add(101);
+		
+		purchaseContractDAO.updateByGroupIds("Alan.Geng", 29, groupIds);
+		
+		List<UserInfoDO> updated = purchaseContractDAO.findByGroupIds(groupIds);
 		System.out.println(JSON.toJSONString(updated, SerializerFeature.PrettyFormat));
 	}
 }

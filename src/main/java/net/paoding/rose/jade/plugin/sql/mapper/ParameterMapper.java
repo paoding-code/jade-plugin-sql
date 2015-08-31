@@ -13,10 +13,12 @@ import net.paoding.rose.jade.plugin.sql.Plum.Operator;
 import net.paoding.rose.jade.plugin.sql.annotations.Eq;
 import net.paoding.rose.jade.plugin.sql.annotations.Ge;
 import net.paoding.rose.jade.plugin.sql.annotations.Gt;
+import net.paoding.rose.jade.plugin.sql.annotations.In;
 import net.paoding.rose.jade.plugin.sql.annotations.Le;
 import net.paoding.rose.jade.plugin.sql.annotations.Like;
 import net.paoding.rose.jade.plugin.sql.annotations.Limit;
 import net.paoding.rose.jade.plugin.sql.annotations.Lt;
+import net.paoding.rose.jade.plugin.sql.annotations.Ne;
 import net.paoding.rose.jade.plugin.sql.annotations.Offset;
 
 /**
@@ -37,11 +39,13 @@ public class ParameterMapper extends AbstractMapper<ParameterOriginal> implement
 		Map<Class<? extends Annotation>, Operator> operators = new HashMap<Class<? extends Annotation>, Operator>(Operator.values().length);
 		
 		operators.put(Like.class, Operator.LIKE);
+		operators.put(In.class, Operator.IN);
 		
 		operators.put(Offset.class, Operator.OFFSET);
 		operators.put(Limit.class, Operator.LIMIT);
 		
 		operators.put(Eq.class, Operator.EQ);
+		operators.put(Ne.class, Operator.NE);
 		operators.put(Ge.class, Operator.GE);
 		operators.put(Gt.class, Operator.GT);
 		operators.put(Le.class, Operator.LE);

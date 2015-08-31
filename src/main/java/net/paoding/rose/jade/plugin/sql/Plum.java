@@ -19,6 +19,11 @@ public class Plum {
 		EQ,
 		
 		/**
+		 * 不等于
+		 */
+		NE,
+		
+		/**
 		 * 大于
 		 */
 		GE,
@@ -42,6 +47,11 @@ public class Plum {
 		 * like
 		 */
 		LIKE,
+		
+		/**
+		 * in
+		 */
+		IN,
 		
 		/**
 		 * 查询区间的起始

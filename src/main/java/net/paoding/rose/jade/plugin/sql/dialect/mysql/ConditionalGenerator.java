@@ -27,11 +27,13 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 	static {
 		Map<Operator, String> operators = new HashMap<Operator, String>(Operator.values().length);
 		operators.put(Operator.EQ, " = ");
+		operators.put(Operator.NE, " != ");
 		operators.put(Operator.GE, " >= ");
 		operators.put(Operator.GT, " > ");
 		operators.put(Operator.LE, " <= ");
 		operators.put(Operator.LT, " < ");
 		operators.put(Operator.LIKE, " LIKE ");
+		operators.put(Operator.IN, " IN ");
 		
 		OPERATORS = Collections.unmodifiableMap(operators);
 	}
@@ -102,16 +104,27 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 		
 		sql.append(param.getName());
 		sql.append(OPERATORS.get(op));
+		
+		if(op == Operator.IN) {
+			sql.append("(");
+		}
+		
 		sql.append(":");
 		
 		
-		if(op != Operator.LIKE && op != Operator.EQ) {
+		if(op != Operator.LIKE
+				&& op != Operator.EQ
+				&& op != Operator.IN) {
 			// Multiple parameter value at the same column.(e.g. age >= 15 AND age < 22)
 			// In "Jade" framework, Parameter value appears first will be overwritten when the same name in annotation "SQLParam".
 			sql.append(index + 1);
 		} else {
-			// Normally, the "like" and "=" condition only once at the same column.
+			// Normally, the "like", "in" or "=" condition only once at the same column.
 			sql.append(param.getOriginalName());
+		}
+		
+		if(op == Operator.IN) {
+			sql.append(")");
 		}
 		
 		return sql.toString();
