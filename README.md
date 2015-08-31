@@ -217,13 +217,79 @@ public interface UserDAO extends GenericDAO<UserDO, Long> {
     LIMIT 0, 2
 ```
 
+### IN查询
+```java
+	/**
+	 * In查询
+	 * @param groupIds
+	 * @return
+	 */
+	public List<UserInfoDO> findByGroupIds(
+			@SQLParam("groupId") @In List<Integer> groupIds);
+```
+```java	
+		List<UserInfoDO> userInfos = userInfoDAO.findByGroupIds(groupIds);
+```
+```sql
+    SELECT
+        id,
+        name,
+        group_id,
+        birthday,
+        age,
+        money,
+        create_time,
+        last_update_time,
+        status,
+        editable 
+    FROM
+        user_info 
+    WHERE
+        group_id IN (
+            :groupId
+        ) 
+    ORDER BY
+        create_time DESC
+```
+
+### 指定条件更新指定字段
+```java
+	/**
+	 * 通过指定字段条件更新
+	 * @param name
+	 * @param group
+	 */
+	public void updateByGroupIds(
+			@SQLParam("name") String name,
+			@SQLParam("age") int age,
+			@Where
+			@SQLParam("groupId") @In List<Integer> group);
+```
+在被`@Where`标记前的所有参数被应用到WHERE子句，否则被应用到UPDATE子句。
+```java
+		userInfoDAO.updateByGroupIds("Alan.Geng", 29, groupIds);
+```
+```sql
+    UPDATE
+        user_info 
+    SET
+        name = :name,
+        age = :age 
+    WHERE
+        group_id IN (
+            :groupId
+        )
+```
+
 ### 用于参数的一些Annotation：
 * Eq: 运算符"="
+* Ne: 运算符"!="
 * Ge: 运算符">="
 * Gt: 运算符">"
 * Le: 运算符"<="
 * Lt: 运算符"<"
 * Like: SQL关键字"LIKE"
+* In: SQL关键字"IN"
 * Offset: 查询记录偏移量
 * Limit: 最大返回记录数
 
