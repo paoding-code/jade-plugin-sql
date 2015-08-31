@@ -50,8 +50,8 @@ public class ConditionalOperationMapper extends OperationMapper {
 			return null;
 		}
 		
-		// 不存在任何Annotation，参数列表中仅有一个参数。
-		if(getPrimaryKeyType().isAssignableFrom(type)
+		if(annotations.length == 0
+				&& getPrimaryKeyType().isAssignableFrom(type)
 				&& original.getMethod().getParameterTypes().length == 1) {
 			// 类型为泛型中的主键类型
 			appendMode(MODE_PRIMARY_KEY);

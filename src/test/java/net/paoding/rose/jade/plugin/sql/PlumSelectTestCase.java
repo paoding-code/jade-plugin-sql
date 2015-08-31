@@ -32,7 +32,7 @@ public class PlumSelectTestCase extends AbstractTestCase {
 	}
 	
 	public void testFindByGroupId() {
-		List<UserInfoDO> userInfos = userInfoDAO.findByGroupId(100);
+		List<UserInfoDO> userInfos = userInfoDAO.findByGroupId(100L);
 		
 		System.out.println(JSON.toJSONString(userInfos, SerializerFeature.PrettyFormat));
 	}
@@ -70,5 +70,22 @@ public class PlumSelectTestCase extends AbstractTestCase {
 		List<UserInfoDO> userInfos = userInfoDAO.findByGroupIds(groupIds);
 		
 		System.out.println(JSON.toJSONString(userInfos, SerializerFeature.PrettyFormat));
+	}
+	
+	public void testAffectedNull() {
+		
+		List<UserInfoDO> users = Plum.affectedNull(new Operation<List<UserInfoDO>>() {
+
+			@Override
+			public List<UserInfoDO> exec() {
+				// 该查询将使用Null做比较
+				return userInfoDAO.findByGroupId(null);
+			}
+		});
+		
+		// 默认则忽略为Null的条件参数
+		userInfoDAO.findByGroupId(null);
+		
+		System.out.println(JSON.toJSONString(users, SerializerFeature.PrettyFormat));
 	}
 }

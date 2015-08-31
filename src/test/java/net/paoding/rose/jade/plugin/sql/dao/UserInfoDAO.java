@@ -38,7 +38,7 @@ public interface UserInfoDAO extends GenericDAO<UserInfoDO, Long> {
 	 * @return
 	 */
 	public List<UserInfoDO> findByGroupId(
-			@SQLParam("groupId") long groupId);
+			@SQLParam("groupId") Long groupId);
 	
 	/**
 	 * 字符串Like查询

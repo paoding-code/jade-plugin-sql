@@ -69,8 +69,6 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 		} else if(operationMapper.isComplexMode()) {
 			List<IParameterMapper> parameters = operationMapper.getParameters();
 			if(PlumUtils.isNotEmpty(parameters)) {
-				sql.append(" WHERE ");
-				
 				int i = operationMapper.getWhereAt();
 				if(i < 0) {
 					// 无任何参数被标记为Where，则视为所有参数都是Where条件。
@@ -83,6 +81,9 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 					String condition = generateCondition(param, runtime, i);
 					
 					if(condition != null) {
+						if(and.length() == 0) {
+							sql.append(" WHERE ");
+						}
 						sql.append(and);
 						sql.append(condition);
 						and = " AND ";
@@ -109,26 +110,25 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 				&& nullValue)
 				|| (nullValue
 				&& op == Operator.IN)) {
-			// When parameter value is null and operator is "in", ignore.
+			// When parameter value is null and operator is "in", or ignore null value.
 			return null;
 		}
 		
 		StringBuilder sql = new StringBuilder();
 		
 		sql.append(param.getName());
-		sql.append(OPERATORS.get(op));
 		
 		if(op == Operator.IN) {
 			sql.append("(");
 		}
-		
-		sql.append(":");
 		
 		if(op != Operator.LIKE
 				&& op != Operator.EQ
 				&& op != Operator.IN) {
 			// Multiple parameter value at the same column.(e.g. age >= 15 AND age < 22)
 			// In "Jade" framework, Parameter value appears first will be overwritten when the same name in annotation "SQLParam".
+			sql.append(OPERATORS.get(op));
+			sql.append(":");
 			sql.append(index + 1);
 		} else {
 			if(nullValue
@@ -136,6 +136,8 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 				sql.append(" is null ");
 			} else {
 				// Normally, the "like", "in" or "=" condition only once at the same column.
+				sql.append(OPERATORS.get(op));
+				sql.append(":");
 				sql.append(param.getOriginalName());
 			}
 		}

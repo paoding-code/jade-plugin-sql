@@ -104,7 +104,7 @@ public class Plum {
 	}
 	
 	/**
-	 * Null值是否生效
+	 * Null值是否参与到查询条件、更新操作等。
 	 * @return
 	 */
 	public static boolean isAffectedNull() {
