@@ -8,7 +8,7 @@ import org.apache.commons.lang.StringUtils;
  * code duplicated from commons-lang、commons-collections.
  * 
  */
-public class MyLangUtils {
+public class PlumUtils {
 
     /**
      * Null-safe check if the specified collection is empty.

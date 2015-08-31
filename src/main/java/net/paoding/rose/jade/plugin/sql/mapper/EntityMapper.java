@@ -14,7 +14,7 @@ import net.paoding.rose.jade.plugin.sql.Order.Direction;
 import net.paoding.rose.jade.plugin.sql.Plum;
 import net.paoding.rose.jade.plugin.sql.annotations.Column;
 import net.paoding.rose.jade.plugin.sql.annotations.Table;
-import net.paoding.rose.jade.plugin.sql.util.MyLangUtils;
+import net.paoding.rose.jade.plugin.sql.util.PlumUtils;
 
 /**
  * @author Alan.Geng[gengzhi718@gmail.com]
@@ -99,7 +99,7 @@ public class EntityMapper extends AbstractMapper<Class<?>> implements IEntityMap
 	@Override
 	public String generateName(String source) {
 		Table table = original.getAnnotation(Table.class);
-		if(table != null && MyLangUtils.isNotBlank(table.value())) {
+		if(table != null && PlumUtils.isNotBlank(table.value())) {
 			return table.value();
 		}
 		return super.generateName(source);

@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
 
 import net.paoding.rose.jade.plugin.sql.Order.Direction;
 import net.paoding.rose.jade.plugin.sql.annotations.Column;
-import net.paoding.rose.jade.plugin.sql.util.MyLangUtils;
+import net.paoding.rose.jade.plugin.sql.util.PlumUtils;
 
 /**
  * @author Alan.Geng[gengzhi718@gmail.com]
@@ -38,7 +38,7 @@ public class ColumnMapper extends AbstractMapper<Field> implements IColumnMapper
 	
 	@Override
 	public String generateName(String source) {
-		if(MyLangUtils.isNotBlank(annotation.value())) {
+		if(PlumUtils.isNotBlank(annotation.value())) {
 			return annotation.value();
 		}
 		return super.generateName(source);

@@ -13,7 +13,7 @@ import net.paoding.rose.jade.plugin.sql.dialect.ISQLGenerator;
 import net.paoding.rose.jade.plugin.sql.mapper.ConditionalOperationMapper;
 import net.paoding.rose.jade.plugin.sql.mapper.IColumnMapper;
 import net.paoding.rose.jade.plugin.sql.mapper.IParameterMapper;
-import net.paoding.rose.jade.plugin.sql.util.MyLangUtils;
+import net.paoding.rose.jade.plugin.sql.util.PlumUtils;
 import net.paoding.rose.jade.statement.StatementRuntime;
 
 /**
@@ -67,7 +67,7 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 			}
 		} else if(operationMapper.isComplexMode()) {
 			List<IParameterMapper> parameters = operationMapper.getParameters();
-			if(MyLangUtils.isNotEmpty(parameters)) {
+			if(PlumUtils.isNotEmpty(parameters)) {
 				sql.append(" WHERE ");
 				
 				int i = operationMapper.getWhereAt();

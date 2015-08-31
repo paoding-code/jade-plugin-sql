@@ -13,7 +13,7 @@ import net.paoding.rose.jade.plugin.sql.mapper.IEntityMapper;
 import net.paoding.rose.jade.plugin.sql.mapper.IExpandableParameterMapper;
 import net.paoding.rose.jade.plugin.sql.mapper.IOperationMapper;
 import net.paoding.rose.jade.plugin.sql.mapper.IParameterMapper;
-import net.paoding.rose.jade.plugin.sql.util.MyLangUtils;
+import net.paoding.rose.jade.plugin.sql.util.PlumUtils;
 import net.paoding.rose.jade.statement.StatementRuntime;
 
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -47,7 +47,7 @@ public class UpdateGenerator extends ConditionalGenerator {
 			}
 			
 			List<IParameterMapper> parameters = operationMapper.getParameters();
-			if(MyLangUtils.isEmpty(parameters)) {
+			if(PlumUtils.isEmpty(parameters)) {
 				throw new InvalidDataAccessApiUsageException("Update operation must have parameters.");
 			}
 			

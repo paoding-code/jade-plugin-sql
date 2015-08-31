@@ -3,7 +3,7 @@
  */
 package net.paoding.rose.jade.plugin.sql.mapper;
 
-import net.paoding.rose.jade.plugin.sql.util.MyLangUtils;
+import net.paoding.rose.jade.plugin.sql.util.PlumUtils;
 
 /**
  * @author Alan.Geng[gengzhi718@gmail.com]
@@ -48,7 +48,7 @@ public abstract class AbstractMapper<O> implements IMapper<O> {
 	}
 	
 	public String generateName(String source) {
-		if(MyLangUtils.isBlank(source)) {
+		if(PlumUtils.isBlank(source)) {
 			return null;
 		}
 		
