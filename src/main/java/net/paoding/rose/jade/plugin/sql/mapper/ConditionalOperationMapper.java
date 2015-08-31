@@ -5,7 +5,7 @@ package net.paoding.rose.jade.plugin.sql.mapper;
 
 import java.lang.annotation.Annotation;
 
-import org.hsqldb.lib.Collection;
+import java.util.Collection;
 
 import net.paoding.rose.jade.plugin.sql.Order;
 import net.paoding.rose.jade.plugin.sql.annotations.Limit;
