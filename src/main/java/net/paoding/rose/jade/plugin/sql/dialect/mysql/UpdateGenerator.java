@@ -35,10 +35,12 @@ public class UpdateGenerator extends ConditionalGenerator {
 	}
 	
 	@Override
-	public String generate(ConditionalOperationMapper operationMapper,
-			StatementRuntime runtime) {
+	public void applyConditions(ConditionalOperationMapper operationMapper,
+			StatementRuntime runtime, StringBuilder sql) {
 		if(operationMapper.isEntityMode()
 				|| operationMapper.isEntityCollectionMode()) {
+			// 通过实体或实体集合更新
+			
 			Map<String, Object> params = runtime.getParameters();
 			if(!operationMapper.getName().equals(IOperationMapper.OPERATION_UPDATE)) {
 				throw new InvalidDataAccessApiUsageException("Operation mapper must be a update.");
@@ -50,14 +52,9 @@ public class UpdateGenerator extends ConditionalGenerator {
 			}
 			
 			IEntityMapper targetEntityMapper = operationMapper.getTargetEntityMapper();
-			
 			if(parameters.size() == 1
 					&& parameters.get(0).getType().equals(targetEntityMapper.getOriginal())) {
-				StringBuilder sql = new StringBuilder(256);
-				sql.append("UPDATE ");
 				StringBuilder where = new StringBuilder(32);
-				sql.append(targetEntityMapper.getName());
-				
 				IParameterMapper param = parameters.get(0);
 				
 				if(param instanceof IExpandableParameterMapper) {
@@ -113,12 +110,22 @@ public class UpdateGenerator extends ConditionalGenerator {
 					throw new InvalidDataAccessApiUsageException("Auto update operation parameter must be a expandable.");
 				}
 				
-				return sql.toString();
 			} else {
 				throw new InvalidDataAccessApiUsageException("Please use the entity object to update.");
 			}
 		} else {
-			return super.generate(operationMapper, runtime);
+			sql.append(" SET ");
+			List<IParameterMapper> parameters = operationMapper.getParameters();
+			for(int i = 0; i < operationMapper.getWhereAt(); i++) {
+				if(i > 0) {
+					sql.append(",");
+				}
+				IParameterMapper param = parameters.get(i);
+				sql.append(param.getName());
+				sql.append(" = :");
+				sql.append(param.getOriginalName());
+			}
+			super.applyConditions(operationMapper, runtime, sql);
 		}
 	}
 	

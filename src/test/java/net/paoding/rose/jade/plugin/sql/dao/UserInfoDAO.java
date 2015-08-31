@@ -14,6 +14,7 @@ import net.paoding.rose.jade.plugin.sql.annotations.Le;
 import net.paoding.rose.jade.plugin.sql.annotations.Like;
 import net.paoding.rose.jade.plugin.sql.annotations.Limit;
 import net.paoding.rose.jade.plugin.sql.annotations.Offset;
+import net.paoding.rose.jade.plugin.sql.annotations.Where;
 import net.paoding.rose.jade.plugin.sql.model.UserInfoDO;
 
 /**
@@ -76,4 +77,15 @@ public interface UserInfoDAO extends GenericDAO<UserInfoDO, Long> {
 			@SQLParam("name") @Like String name,
 			@Offset int offset,
 			@Limit int limit);
+	
+	/**
+	 * 通过指定字段条件更新
+	 * @param name
+	 * @param group
+	 */
+	public void updateByGroup(
+			@SQLParam("name") String name,
+			@SQLParam("age") int age,
+			@Where
+			@SQLParam("groupId") Integer group);
 }

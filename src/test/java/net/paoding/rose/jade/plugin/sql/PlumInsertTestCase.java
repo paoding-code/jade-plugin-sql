@@ -11,6 +11,9 @@ import java.util.List;
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+
 import net.paoding.rose.jade.plugin.sql.dao.UserInfoDAO;
 import net.paoding.rose.jade.plugin.sql.model.UserInfoDO;
 
@@ -32,7 +35,10 @@ public class PlumInsertTestCase extends AbstractTestCase {
 	public void testInsert() {
 		UserInfoDO userInfo = createUserInfoDO(102, 30);
 		
-		userInfoDAO.save(userInfo);
+		Long id = userInfoDAO.save(userInfo);
+		
+		
+		System.out.println(JSON.toJSONString(userInfoDAO.get(id), SerializerFeature.PrettyFormat));
 	}
 	
 	public void testBatchInsert() {
