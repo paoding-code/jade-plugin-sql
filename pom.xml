@@ -1,34 +1,35 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <!-- 基本配置 -->
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.paoding</groupId>
     <artifactId>jade-plugin-sql</artifactId>
     <packaging>jar</packaging>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <name>jade-plugin-sql</name>
 
     <!-- parent -->
     <parent>
         <groupId>net.paoding</groupId>
         <artifactId>paoding-rose-parent</artifactId>
-        <version>2.0-SNAPSHOT</version>
+        <version>2.0.u02</version>
     </parent>
 
-    <!-- snapshot库 -->
-    <repositories>
-        <repository>
-            <id>ossrh-snapshots</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
+    <!-- 开发人员说明 -->
+    <developers>
+        <developer>
+            <name>耿直Alan.Geng</name>
+            <email>gengzhi718@gmail.com</email>
+        </developer>
+    </developers>
+    
 
+    <!-- 代码库 -->
+    <scm>
+        <connection>scm:git:git@github.com:paoding-code/jade-plugin-sql.git</connection>
+        <developerConnection>scm:git:git@github.com:paoding-code/jade-plugin-sql.git</developerConnection>
+        <url>git@github.com:paoding-code/jade-plugin-sql.git</url>
+    </scm>
+    
     <!-- 所有的依赖的版本都必须要在这里定义好，不在具体的dependency写实际的version -->
     <properties>
         <!-- dependencies version -->
