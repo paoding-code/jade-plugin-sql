@@ -228,7 +228,7 @@ public interface UserDAO extends GenericDAO<UserDO, Long> {
 			@SQLParam("groupId") @In List<Integer> groupIds);
 ```
 ```java	
-		List<UserInfoDO> userInfos = userInfoDAO.findByGroupIds(groupIds);
+	List<UserInfoDO> userInfos = userInfoDAO.findByGroupIds(groupIds);
 ```
 ```sql
     SELECT
@@ -267,7 +267,7 @@ public interface UserDAO extends GenericDAO<UserDO, Long> {
 ```
 在被`@Where`标记前的所有参数被应用到WHERE子句，否则被应用到UPDATE子句。
 ```java
-		userInfoDAO.updateByGroupIds("Alan.Geng", 29, groupIds);
+	userInfoDAO.updateByGroupIds("Alan.Geng", 29, groupIds);
 ```
 ```sql
     UPDATE
