@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.paoding.rose.jade.plugin.sql.Plum;
 import net.paoding.rose.jade.plugin.sql.Plum.Operator;
 import net.paoding.rose.jade.plugin.sql.dialect.ISQLGenerator;
 import net.paoding.rose.jade.plugin.sql.mapper.ConditionalOperationMapper;
@@ -100,6 +101,18 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 			return null;
 		}
 		
+		Object value = runtime.getParameters().get(":" + (index + 1));
+		boolean nullValue = value == null;
+		boolean affectedNull = Plum.isAffectedNull();
+		
+		if((!affectedNull
+				&& nullValue)
+				|| (nullValue
+				&& op == Operator.IN)) {
+			// When parameter value is null and operator is "in", ignore.
+			return null;
+		}
+		
 		StringBuilder sql = new StringBuilder();
 		
 		sql.append(param.getName());
@@ -111,7 +124,6 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 		
 		sql.append(":");
 		
-		
 		if(op != Operator.LIKE
 				&& op != Operator.EQ
 				&& op != Operator.IN) {
@@ -119,8 +131,13 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 			// In "Jade" framework, Parameter value appears first will be overwritten when the same name in annotation "SQLParam".
 			sql.append(index + 1);
 		} else {
-			// Normally, the "like", "in" or "=" condition only once at the same column.
-			sql.append(param.getOriginalName());
+			if(nullValue
+					&& op == Operator.EQ) {
+				sql.append(" is null ");
+			} else {
+				// Normally, the "like", "in" or "=" condition only once at the same column.
+				sql.append(param.getOriginalName());
+			}
 		}
 		
 		if(op == Operator.IN) {
