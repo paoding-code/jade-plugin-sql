@@ -46,7 +46,7 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 	}
 	
 	protected void applyConditions(ConditionalOperationMapper operationMapper, StatementRuntime runtime, StringBuilder sql) {
-		if(operationMapper.isPrimaryKeyConditionMode()) {
+		if(operationMapper.isPrimaryKeyMode()) {
 			sql.append(" WHERE ");
 			List<IColumnMapper> primaryKey = operationMapper.getTargetEntityMapper().getPrimaryKey();
 			
@@ -63,7 +63,7 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 				// TODO:当实体为符合主键并且参数列表中的顺序与实体中字段顺序不一致，则会发生错误。
 				sql.append(i + 1);
 			}
-		} else if(operationMapper.isComplexConditionMode()) {
+		} else if(operationMapper.isComplexMode()) {
 			List<IParameterMapper> parameters = operationMapper.getParameters();
 			if(MyLangUtils.isNotEmpty(parameters)) {
 				sql.append(" WHERE ");

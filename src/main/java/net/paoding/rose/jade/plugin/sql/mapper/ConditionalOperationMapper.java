@@ -29,10 +29,10 @@ public class ConditionalOperationMapper extends OperationMapper {
 	
 	private long mode = 0;
 	
-	private static final long CONDITION_MODE_PRIMARY_KEY = 1;
-	private static final long CONDITION_MODE_COMPLEX = 1 << 1;
-	private static final long CONDITION_MODE_ENTITY = 1 << 2;
-	private static final long CONDITION_MODE_ENTITY_COLLECTION = 1 << 3;
+	private static final long MODE_PRIMARY_KEY = 1;
+	private static final long MODE_COMPLEX = 1 << 1;
+	private static final long MODE_ENTITY = 1 << 2;
+	private static final long MODE_ENTITY_COLLECTION = 1 << 3;
 	
 	public ConditionalOperationMapper(StatementMetaData original) {
 		super(original);
@@ -50,56 +50,56 @@ public class ConditionalOperationMapper extends OperationMapper {
 			return null;
 		}
 		
-		if(annotations.length > 0){
-			for(int i = 0; i < annotations.length; i++) {
-				Annotation annotation = annotations[i];
-				if(annotation.annotationType() == Offset.class) {
-					// 偏移量
-					if(containsOffset()) {
-						throw new MappingException("Multiple offset parameter.");
-					}
-					if(!Number.class.isAssignableFrom(type)
-							&& type != int.class
-							&& type != long.class) {
-						throw new MappingException("The offset parameter must be int, long or Number.");
-					}
-					offsetParameterIndex = index;
-				} else if(annotation.annotationType() == Limit.class) {
-					// 最大返回记录数
-					if(containsLimit()) {
-						throw new MappingException("Multiple limit parameter.");
-					}
-					if(!Number.class.isAssignableFrom(type)
-							&& type != int.class
-							&& type != long.class) {
-						throw new MappingException("The offset parameter must be int, long or Number.");
-					}
-					limitParameterIndex = index;
-				} else if(annotation.annotationType() == Where.class
-						&& OPERATION_UPDATE.equals(getName())) {
-					// Where条件的位置，用于更新操作，其他操作该注解无任何意义。
-					if(index == 0) {
-						// 如果该注解被标记在第一个参数前，证明该操作没有任何值用于更新。
-						throw new MappingException("When update operation, the annotation \"Where\" cannot appear before at first parameter.");
-					}
-					whereAt = index;
-				}
-				appendMode(CONDITION_MODE_COMPLEX);
+		// 不存在任何Annotation，参数列表中仅有一个参数。
+		if(getPrimaryKeyType().isAssignableFrom(type)
+				&& original.getMethod().getParameterTypes().length == 1) {
+			// 类型为泛型中的主键类型
+			appendMode(MODE_PRIMARY_KEY);
+		} else if(getEntityType().isAssignableFrom(type)
+				&& original.getMethod().getParameterTypes().length == 1) {
+			if(Collection.class.isAssignableFrom(original.getMethod().getParameterTypes()[index])) {
+				// 实际类型为集合
+				appendMode(MODE_ENTITY_COLLECTION);
+			} else {
+				// 类型为泛型中的实体类型
+				appendMode(MODE_ENTITY);
 			}
-		} else if(original.getMethod().getParameterTypes().length == 1) {
-			// 不存在任何Annotation，参数列表中仅有一个参数。
-			if(getPrimaryKeyType().isAssignableFrom(type)) {
-				// 类型为泛型中的主键类型
-				appendMode(CONDITION_MODE_PRIMARY_KEY);
-			} else if(getEntityType().isAssignableFrom(type)) {
-				if(Collection.class.isAssignableFrom(original.getMethod().getParameterTypes()[index])) {
-					// 实际类型为集合
-					appendMode(CONDITION_MODE_ENTITY_COLLECTION);
-				} else {
-					// 类型为泛型中的实体类型
-					appendMode(CONDITION_MODE_ENTITY);
+		}
+		
+		for(int i = 0; i < annotations.length; i++) {
+			Annotation annotation = annotations[i];
+			if(annotation.annotationType() == Offset.class) {
+				// 偏移量
+				if(containsOffset()) {
+					throw new MappingException("Multiple offset parameter.");
 				}
+				if(!Number.class.isAssignableFrom(type)
+						&& type != int.class
+						&& type != long.class) {
+					throw new MappingException("The offset parameter must be int, long or Number.");
+				}
+				offsetParameterIndex = index;
+			} else if(annotation.annotationType() == Limit.class) {
+				// 最大返回记录数
+				if(containsLimit()) {
+					throw new MappingException("Multiple limit parameter.");
+				}
+				if(!Number.class.isAssignableFrom(type)
+						&& type != int.class
+						&& type != long.class) {
+					throw new MappingException("The offset parameter must be int, long or Number.");
+				}
+				limitParameterIndex = index;
+			} else if(annotation.annotationType() == Where.class
+					&& OPERATION_UPDATE.equals(getName())) {
+				// Where条件的位置，用于更新操作，其他操作该注解无任何意义。
+				if(index == 0) {
+					// 如果该注解被标记在第一个参数前，证明该操作没有任何值用于更新。
+					throw new MappingException("When update operation, the annotation \"Where\" cannot appear before at first parameter.");
+				}
+				whereAt = index;
 			}
+			appendMode(MODE_COMPLEX);
 		}
 		
 		return super.createParameterMapper(type, annotations, index);
@@ -144,12 +144,20 @@ public class ConditionalOperationMapper extends OperationMapper {
 		return whereAt;
 	}
 	
-	public boolean isPrimaryKeyConditionMode() {
-		return isSpecifiedMode(CONDITION_MODE_PRIMARY_KEY);
+	public boolean isPrimaryKeyMode() {
+		return isSpecifiedMode(MODE_PRIMARY_KEY);
 	}
 	
-	public boolean isComplexConditionMode() {
-		return isSpecifiedMode(CONDITION_MODE_COMPLEX);
+	public boolean isComplexMode() {
+		return isSpecifiedMode(MODE_COMPLEX);
+	}
+	
+	public boolean isEntityMode() {
+		return isSpecifiedMode(MODE_ENTITY);
+	}
+	
+	public boolean isEntityCollectionMode() {
+		return isSpecifiedMode(MODE_ENTITY_COLLECTION);
 	}
 	
 	private boolean isSpecifiedMode(long mode) {
