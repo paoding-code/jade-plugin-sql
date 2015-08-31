@@ -13,6 +13,14 @@
         <artifactId>paoding-rose-parent</artifactId>
         <version>2.0.u02</version>
     </parent>
+
+    <!-- 开发人员说明 -->
+    <developers>
+        <developer>
+            <name>耿直Alan.Geng</name>
+            <email>gengzhi718@gmail.com</email>
+        </developer>
+    </developers>
     
 
     <!-- 代码库 -->
