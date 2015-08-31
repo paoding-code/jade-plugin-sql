@@ -12,7 +12,7 @@ jade-plugin-sql是一个 paoding-rose-jade 插件。它能够根据 DAO 方法�
 	<groupId>net.paoding</groupId>
 	<artifactId>jade-plugin-sql</artifactId>
 	<!-- A young boy! Hahaha~~ -->
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 </dependency>
 ```
 
