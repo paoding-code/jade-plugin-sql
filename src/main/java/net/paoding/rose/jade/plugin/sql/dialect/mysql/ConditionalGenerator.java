@@ -104,9 +104,9 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 		
 		Object value = runtime.getParameters().get(":" + (index + 1));
 		boolean nullValue = value == null;
-		boolean affectedNull = Plum.isAffectedNull();
+		boolean ignoreNull = Plum.isIgnoreNull();
 		
-		if((!affectedNull
+		if((ignoreNull
 				&& nullValue)
 				|| (nullValue
 				&& op == Operator.IN)) {

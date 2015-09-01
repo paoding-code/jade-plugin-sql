@@ -104,39 +104,39 @@ public class Plum {
 	}
 	
 	/**
-	 * Null值是否参与到查询条件、更新操作等。
+	 * 是否忽略Null值
 	 * @return
 	 */
-	public static boolean isAffectedNull() {
+	public static boolean isIgnoreNull() {
 		Context context = LOCAL.get();
-		return context != null && context.isAffectedNull();
+		return context != null && context.isIgnoreNull();
 	}
 	
 	/**
-	 * 执行Null值生效的操作
+	 * 执行忽略Null值的操作
 	 * @param operation
 	 * @return
 	 */
-	public static <T> T affectedNull(Operation<T> operation) {
+	public static <T> T ignoreNull(Operation<T> operation) {
 		Context context = getContext();
 		try {
-			context.setAffectedNull(true);
+			context.setIgnoreNull(true);
 			return operation.exec();
 		} finally {
-			context.setAffectedNull(false);
+			context.setIgnoreNull(false);
 		}
 	}
 	
 	public static class Context {
 		
-		private boolean affectedNull = false;
+		private boolean ignoreNull = false;
 
-		public boolean isAffectedNull() {
-			return affectedNull;
+		public boolean isIgnoreNull() {
+			return ignoreNull;
 		}
 
-		public void setAffectedNull(boolean affectedNull) {
-			this.affectedNull = affectedNull;
+		public void setIgnoreNull(boolean ignoreNull) {
+			this.ignoreNull = ignoreNull;
 		}
 
 	}

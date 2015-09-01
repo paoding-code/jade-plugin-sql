@@ -74,7 +74,7 @@ public class PlumSelectTestCase extends AbstractTestCase {
 	
 	public void testAffectedNull() {
 		
-		List<UserInfoDO> users = Plum.affectedNull(new Operation<List<UserInfoDO>>() {
+		List<UserInfoDO> users = Plum.ignoreNull(new Operation<List<UserInfoDO>>() {
 
 			@Override
 			public List<UserInfoDO> exec() {
