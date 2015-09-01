@@ -20,4 +20,6 @@ public interface IParameterMapper extends IMapper<ParameterOriginal> {
 	Operator getOperator();
 	
 	IParameterMapper getParent();
+	
+	boolean isIgnoreNull();
 }

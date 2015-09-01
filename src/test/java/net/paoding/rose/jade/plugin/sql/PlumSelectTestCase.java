@@ -72,20 +72,4 @@ public class PlumSelectTestCase extends AbstractTestCase {
 		System.out.println(JSON.toJSONString(userInfos, SerializerFeature.PrettyFormat));
 	}
 	
-	public void testAffectedNull() {
-		
-		List<UserInfoDO> users = Plum.ignoreNull(new Operation<List<UserInfoDO>>() {
-
-			@Override
-			public List<UserInfoDO> exec() {
-				// 该查询将使用Null做比较
-				return userInfoDAO.findByGroupId(null);
-			}
-		});
-		
-		// 默认则忽略为Null的条件参数
-		userInfoDAO.findByGroupId(null);
-		
-		System.out.println(JSON.toJSONString(users, SerializerFeature.PrettyFormat));
-	}
 }

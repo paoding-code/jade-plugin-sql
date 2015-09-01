@@ -13,6 +13,7 @@ import net.paoding.rose.jade.plugin.sql.Plum.Operator;
 import net.paoding.rose.jade.plugin.sql.annotations.Eq;
 import net.paoding.rose.jade.plugin.sql.annotations.Ge;
 import net.paoding.rose.jade.plugin.sql.annotations.Gt;
+import net.paoding.rose.jade.plugin.sql.annotations.IgnoreNull;
 import net.paoding.rose.jade.plugin.sql.annotations.In;
 import net.paoding.rose.jade.plugin.sql.annotations.Le;
 import net.paoding.rose.jade.plugin.sql.annotations.Like;
@@ -30,6 +31,8 @@ public class ParameterMapper extends AbstractMapper<ParameterOriginal> implement
 	private IParameterMapper parent;
 	
 	private IColumnMapper columnMapper;
+	
+	private boolean ignoreNull = true;
 	
 	private Operator operator = Operator.EQ;
 	
@@ -70,10 +73,13 @@ public class ParameterMapper extends AbstractMapper<ParameterOriginal> implement
 		Annotation[] annotations = original.getAnnotations();
 		if(annotations != null && annotations.length > 0) {
 			for(Annotation annotation : annotations) {
-				Operator operator = OPERATORS.get(annotation.annotationType());
-				if(operator != null) {
-					this.operator = operator;
-					break;
+				if(annotation.annotationType() == IgnoreNull.class) {
+					ignoreNull = ((IgnoreNull) annotation).value();
+				} else {
+					Operator operator = OPERATORS.get(annotation.annotationType());
+					if(operator != null) {
+						this.operator = operator;
+					}
 				}
 			}
 		}
@@ -100,6 +106,10 @@ public class ParameterMapper extends AbstractMapper<ParameterOriginal> implement
 
 	public Operator getOperator() {
 		return operator;
+	}
+
+	public boolean isIgnoreNull() {
+		return getParent() == null ? ignoreNull : getParent().isIgnoreNull();
 	}
 	
 }

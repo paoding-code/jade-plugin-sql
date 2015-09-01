@@ -11,8 +11,6 @@ import net.paoding.rose.jade.plugin.sql.Order.Direction;
  */
 public class Plum {
 	
-	private static final ThreadLocal<Context> LOCAL = new ThreadLocal<Context>();
-	
 	public static enum Operator {
 		
 		/**
@@ -92,53 +90,6 @@ public class Plum {
 	 */
 	public static Order orderBy(Direction direction, String... fields) {
 		return new Order(fields, direction);
-	}
-	
-	private static Context getContext() {
-		Context context = LOCAL.get();
-		if(context == null) {
-			context = new Context();
-			LOCAL.set(context);
-		}
-		return context;
-	}
-	
-	/**
-	 * 是否忽略Null值
-	 * @return
-	 */
-	public static boolean isIgnoreNull() {
-		Context context = LOCAL.get();
-		return context != null && context.isIgnoreNull();
-	}
-	
-	/**
-	 * 执行忽略Null值的操作
-	 * @param operation
-	 * @return
-	 */
-	public static <T> T ignoreNull(Operation<T> operation) {
-		Context context = getContext();
-		try {
-			context.setIgnoreNull(true);
-			return operation.exec();
-		} finally {
-			context.setIgnoreNull(false);
-		}
-	}
-	
-	public static class Context {
-		
-		private boolean ignoreNull = false;
-
-		public boolean isIgnoreNull() {
-			return ignoreNull;
-		}
-
-		public void setIgnoreNull(boolean ignoreNull) {
-			this.ignoreNull = ignoreNull;
-		}
-
 	}
 	
 }

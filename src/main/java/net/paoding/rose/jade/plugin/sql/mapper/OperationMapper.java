@@ -16,6 +16,7 @@ import java.util.List;
 
 import net.paoding.rose.jade.annotation.SQLParam;
 import net.paoding.rose.jade.plugin.sql.GenericDAO;
+import net.paoding.rose.jade.plugin.sql.annotations.IgnoreNull;
 import net.paoding.rose.jade.statement.StatementMetaData;
 
 /**
@@ -34,6 +35,8 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 	
 	private Class<?> primaryKeyType;
 	
+	private boolean ignoreNull = true;
+	
 	public static final List<IParameterMapper> NO_PARAMETER = Collections.unmodifiableList(new ArrayList<IParameterMapper>());
 	
 	public OperationMapper(StatementMetaData original) {
@@ -47,6 +50,10 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 
 	@Override
 	protected void doMap() {
+		IgnoreNull ignoreNull = original.getAnnotation(IgnoreNull.class);
+		if(ignoreNull != null) {
+			this.ignoreNull = ignoreNull.value();
+		}
 		mapGenericEntityType();
 		mapTargetEntityMapper();
 		mapParameters();
@@ -209,6 +216,10 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 
 	public Class<?> getEntityType() {
 		return entityType;
+	}
+
+	public boolean isIgnoreNull() {
+		return ignoreNull;
 	}
 	
 }

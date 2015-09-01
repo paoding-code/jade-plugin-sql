@@ -40,4 +40,6 @@ public interface IOperationMapper extends IMapper<StatementMetaData> {
 	
 	void setEntityMapperManager(EntityMapperManager entityMapperManager);
 	
+	boolean isIgnoreNull();
+	
 }

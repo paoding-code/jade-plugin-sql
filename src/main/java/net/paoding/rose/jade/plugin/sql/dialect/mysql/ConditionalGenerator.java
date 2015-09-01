@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.paoding.rose.jade.plugin.sql.Plum;
 import net.paoding.rose.jade.plugin.sql.Plum.Operator;
 import net.paoding.rose.jade.plugin.sql.dialect.ISQLGenerator;
 import net.paoding.rose.jade.plugin.sql.mapper.ConditionalOperationMapper;
@@ -78,7 +77,7 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 				String and = "";
 				for(; i < parameters.size(); i++) {
 					IParameterMapper param = parameters.get(i);
-					String condition = generateCondition(param, runtime, i);
+					String condition = generateCondition(operationMapper, param, runtime, i);
 					
 					if(condition != null) {
 						if(and.length() == 0) {
@@ -95,7 +94,7 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 		}
 	}
 	
-	protected String generateCondition(IParameterMapper param, StatementRuntime runtime, int index) {
+	protected String generateCondition(ConditionalOperationMapper operationMapper, IParameterMapper param, StatementRuntime runtime, int index) {
 		Operator op = param.getOperator();
 		
 		if(!OPERATORS.containsKey(op)) {
@@ -104,7 +103,7 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 		
 		Object value = runtime.getParameters().get(":" + (index + 1));
 		boolean nullValue = value == null;
-		boolean ignoreNull = Plum.isIgnoreNull();
+		boolean ignoreNull = operationMapper.isIgnoreNull() || param.isIgnoreNull();
 		
 		if((ignoreNull
 				&& nullValue)

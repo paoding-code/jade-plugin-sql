@@ -10,6 +10,7 @@ import net.paoding.rose.jade.annotation.SQLParam;
 import net.paoding.rose.jade.plugin.sql.GenericDAO;
 import net.paoding.rose.jade.plugin.sql.Order;
 import net.paoding.rose.jade.plugin.sql.annotations.Ge;
+import net.paoding.rose.jade.plugin.sql.annotations.IgnoreNull;
 import net.paoding.rose.jade.plugin.sql.annotations.In;
 import net.paoding.rose.jade.plugin.sql.annotations.Le;
 import net.paoding.rose.jade.plugin.sql.annotations.Like;
@@ -74,6 +75,7 @@ public interface UserInfoDAO extends GenericDAO<UserInfoDO, Long> {
 	 * @param range
 	 * @return
 	 */
+	@IgnoreNull(false)
 	public List<UserInfoDO> findByNameWithLimit(
 			@SQLParam("name") @Like String name,
 			@Offset int offset,

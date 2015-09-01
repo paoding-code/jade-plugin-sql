@@ -7,7 +7,6 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
-import net.paoding.rose.jade.plugin.sql.Plum;
 import net.paoding.rose.jade.plugin.sql.mapper.ConditionalOperationMapper;
 import net.paoding.rose.jade.plugin.sql.mapper.IColumnMapper;
 import net.paoding.rose.jade.plugin.sql.mapper.IEntityMapper;
@@ -57,6 +56,7 @@ public class UpdateGenerator extends ConditionalGenerator {
 					&& parameters.get(0).getType().equals(targetEntityMapper.getOriginal())) {
 				StringBuilder where = new StringBuilder(32);
 				IParameterMapper param = parameters.get(0);
+				boolean ignoreNull = operationMapper.isIgnoreNull() || param.isIgnoreNull();
 				
 				if(param instanceof IExpandableParameterMapper) {
 					List<IParameterMapper> expandParams = ((IExpandableParameterMapper) param).expand();
@@ -87,7 +87,10 @@ public class UpdateGenerator extends ConditionalGenerator {
 									where.append(".");
 									where.append(p.getColumnMapper().getOriginalName());
 								} else {
-									if(Plum.isIgnoreNull() || value != null) {
+									if(ignoreNull
+											&& value == null) {
+										continue;
+									} else {
 										sql.append(" ");
 										sql.append(p.getColumnMapper().getName());
 										sql.append(" = ");
