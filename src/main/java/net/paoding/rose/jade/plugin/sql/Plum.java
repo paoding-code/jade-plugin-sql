@@ -64,6 +64,9 @@ public class Plum {
 		LIMIT;
 	};
 	
+	/**
+	 * 默认忽略空
+	 */
 	public static boolean DEFAULT_IGNORE_NULL = true;
 	
 	/**

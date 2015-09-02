@@ -123,15 +123,18 @@ public class ParameterMapper extends AbstractMapper<ParameterOriginal> implement
 
 	public IgnoreNull getIgnoreNull() {
 		if(ignoreNull != null) {
+			// 参数自身的annotation优先级最高
 			return ignoreNull;
 		}
 		
 		IParameterMapper parent = getParent();
 		if(parent != null) {
+			// 当自身不存在则查找parent是否存在忽略空设置，通常为被展开的参数。
 			return parent.getIgnoreNull();
 		}
 		
 		if(operationMapper != null) {
+			// 最后查找所属操作是否存在忽略空设置
 			return operationMapper.getIgnoreNull();
 		}
 		return null;

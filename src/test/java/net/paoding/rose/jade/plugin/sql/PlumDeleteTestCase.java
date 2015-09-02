@@ -19,4 +19,9 @@ public class PlumDeleteTestCase extends AbstractTestCase {
 	public void testDelete() {
 		userInfoDAO.delete(0l);
 	}
+	
+	public void testDeleteByGroupId() {
+		userInfoDAO.deleteByGroupId(100);
+		printJson(userInfoDAO.findByNameLike("耿直%"));
+	}
 }

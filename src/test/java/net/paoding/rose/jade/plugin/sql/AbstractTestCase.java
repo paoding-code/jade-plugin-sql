@@ -10,6 +10,8 @@ import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.alibaba.fastjson.JSON;
+
 import junit.framework.TestCase;
 import net.paoding.rose.jade.plugin.sql.dao.CreateTableDAO;
 import net.paoding.rose.jade.plugin.sql.dao.UserInfoDAO;
@@ -65,6 +67,10 @@ public abstract class AbstractTestCase extends TestCase {
         userInfo.setLastUpdateTime(new Date());
 
         return userInfo;
+    }
+    
+    protected void printJson(Object object) {
+    	System.out.println(JSON.toJSONString(object, true));
     }
 
 }

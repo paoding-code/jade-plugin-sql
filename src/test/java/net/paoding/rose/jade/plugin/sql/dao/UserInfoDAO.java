@@ -110,4 +110,11 @@ public interface UserInfoDAO extends GenericDAO<UserInfoDO, Long> {
 			@SQLParam("age") int age,
 			@Where
 			@SQLParam("groupId") @In List<Integer> group);
+	
+	/**
+	 * 通过指定字段删除
+	 * @param groupId
+	 */
+	public void deleteByGroupId(
+			@SQLParam("groupId") Integer groupId);
 }
