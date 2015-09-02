@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.paoding.rose.jade.annotation.SQLParam;
+import net.paoding.rose.jade.plugin.sql.Plum;
 import net.paoding.rose.jade.plugin.sql.Plum.Operator;
 import net.paoding.rose.jade.plugin.sql.annotations.Eq;
 import net.paoding.rose.jade.plugin.sql.annotations.Ge;
@@ -28,11 +29,13 @@ import net.paoding.rose.jade.plugin.sql.annotations.Offset;
  */
 public class ParameterMapper extends AbstractMapper<ParameterOriginal> implements IParameterMapper {
 	
+	private IOperationMapper operationMapper;
+	
 	private IParameterMapper parent;
 	
 	private IColumnMapper columnMapper;
 	
-	private boolean ignoreNull = true;
+	private IgnoreNull ignoreNull;
 	
 	private Operator operator = Operator.EQ;
 	
@@ -63,8 +66,9 @@ public class ParameterMapper extends AbstractMapper<ParameterOriginal> implement
 		this.columnMapper = columnMapper;
 	}
 	
-	public ParameterMapper(SQLParam original, Class<?> type, Annotation[] annotations) {
+	public ParameterMapper(IOperationMapper operationMapper, SQLParam original, Class<?> type, Annotation[] annotations) {
 		super(new ParameterOriginal(original, type, annotations));
+		this.operationMapper = operationMapper;
 	}
 	
 	@Override
@@ -74,7 +78,7 @@ public class ParameterMapper extends AbstractMapper<ParameterOriginal> implement
 		if(annotations != null && annotations.length > 0) {
 			for(Annotation annotation : annotations) {
 				if(annotation.annotationType() == IgnoreNull.class) {
-					ignoreNull = ((IgnoreNull) annotation).value();
+					ignoreNull = (IgnoreNull) annotation;
 				} else {
 					Operator operator = OPERATORS.get(annotation.annotationType());
 					if(operator != null) {
@@ -109,7 +113,28 @@ public class ParameterMapper extends AbstractMapper<ParameterOriginal> implement
 	}
 
 	public boolean isIgnoreNull() {
-		return getParent() == null ? ignoreNull : getParent().isIgnoreNull();
+		IgnoreNull ignoreNull = getIgnoreNull();
+		if(ignoreNull == null) {
+			return Plum.DEFAULT_IGNORE_NULL;
+		}
+		
+		return ignoreNull.value();
+	}
+
+	public IgnoreNull getIgnoreNull() {
+		if(ignoreNull != null) {
+			return ignoreNull;
+		}
+		
+		IParameterMapper parent = getParent();
+		if(parent != null) {
+			return parent.getIgnoreNull();
+		}
+		
+		if(operationMapper != null) {
+			return operationMapper.getIgnoreNull();
+		}
+		return null;
 	}
 	
 }

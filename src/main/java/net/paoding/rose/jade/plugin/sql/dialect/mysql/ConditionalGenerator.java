@@ -103,7 +103,7 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 		
 		Object value = runtime.getParameters().get(":" + (index + 1));
 		boolean nullValue = value == null;
-		boolean ignoreNull = operationMapper.isIgnoreNull() || param.isIgnoreNull();
+		boolean ignoreNull = param.isIgnoreNull();
 		
 		if((ignoreNull
 				&& nullValue)

@@ -95,8 +95,8 @@ public interface UserInfoDAO extends GenericDAO<UserInfoDO, Long> {
 	 * @param group
 	 */
 	public void updateByGroup(
-			@SQLParam("name") String name,
-			@SQLParam("age") int age,
+			@SQLParam("name") @IgnoreNull(false) String name,
+			@SQLParam("age") Integer age,
 			@Where
 			@SQLParam("groupId") Integer group);
 	

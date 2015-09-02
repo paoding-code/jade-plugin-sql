@@ -62,7 +62,9 @@ public class Plum {
 		 * 限制查询条目数
 		 */
 		LIMIT;
-	}
+	};
+	
+	public static boolean DEFAULT_IGNORE_NULL = true;
 	
 	/**
 	 * 升序

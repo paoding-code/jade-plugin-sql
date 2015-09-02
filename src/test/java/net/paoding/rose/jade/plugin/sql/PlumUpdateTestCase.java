@@ -38,7 +38,7 @@ public class PlumUpdateTestCase extends AbstractTestCase {
 	}
 	
 	public void testSpecialUpdate() {
-		purchaseContractDAO.updateByGroup("Alan.Geng", 29, 100);
+		purchaseContractDAO.updateByGroup(null, 25, 100);
 		
 		List<UserInfoDO> updated = purchaseContractDAO.findByGroupId(100L);
 		System.out.println(JSON.toJSONString(updated, SerializerFeature.PrettyFormat));

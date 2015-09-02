@@ -41,7 +41,7 @@ public class UpdateGenerator extends ConditionalGenerator {
 				|| operationMapper.isEntityCollectionMode()) {
 			// 通过实体或实体集合更新
 			
-			Map<String, Object> params = runtime.getParameters();
+			Map<String, Object> parametersValue = runtime.getParameters();
 			if(!operationMapper.getName().equals(IOperationMapper.OPERATION_UPDATE)) {
 				throw new InvalidDataAccessApiUsageException("Operation mapper must be a update.");
 			}
@@ -56,19 +56,22 @@ public class UpdateGenerator extends ConditionalGenerator {
 					&& parameters.get(0).getType().equals(targetEntityMapper.getOriginal())) {
 				StringBuilder where = new StringBuilder(32);
 				IParameterMapper param = parameters.get(0);
-				boolean ignoreNull = operationMapper.isIgnoreNull() || param.isIgnoreNull();
 				
 				if(param instanceof IExpandableParameterMapper) {
 					List<IParameterMapper> expandParams = ((IExpandableParameterMapper) param).expand();
-					Object entityObject = params.entrySet().iterator().next().getValue();
+					Object parameterValue = parametersValue.entrySet().iterator().next().getValue();
 					
-					sql.append(" SET");
-					try {
+					sql.append(" SET ");
 						for(IParameterMapper p : expandParams) {
 							IColumnMapper columnMapper = p.getColumnMapper();
 							if(columnMapper != null) {
 								Field field = p.getColumnMapper().getOriginal();
-								Object value = field.get(entityObject);
+								Object value = null;
+								try {
+									value = field.get(parameterValue);
+								} catch (Exception e) {
+									throw new IllegalArgumentException("Cannot get field value \"" + operationMapper.getTargetEntityMapper().getOriginal().getSimpleName() + "." + field.getName() + "\".", e);
+								}
 								if(p.getColumnMapper().isPrimaryKey()) {
 									// 主键视为条件
 									if(value == null) {
@@ -87,11 +90,10 @@ public class UpdateGenerator extends ConditionalGenerator {
 									where.append(".");
 									where.append(p.getColumnMapper().getOriginalName());
 								} else {
-									if(ignoreNull
+									if(param.isIgnoreNull()
 											&& value == null) {
 										continue;
 									} else {
-										sql.append(" ");
 										sql.append(p.getColumnMapper().getName());
 										sql.append(" = ");
 										sql.append(":");
@@ -105,11 +107,7 @@ public class UpdateGenerator extends ConditionalGenerator {
 						}
 						sql.setLength(sql.length() - 1);
 						sql.append(where);
-					} catch(IllegalArgumentException e) {
-						throw new InvalidDataAccessApiUsageException("", e);
-					} catch (Exception e) {
-						throw new InvalidDataAccessApiUsageException("Cannot generate sql.", e);
-					}
+
 				} else {
 					throw new InvalidDataAccessApiUsageException("Auto update operation parameter must be a expandable.");
 				}
@@ -118,16 +116,33 @@ public class UpdateGenerator extends ConditionalGenerator {
 				throw new InvalidDataAccessApiUsageException("Please use the entity object to update.");
 			}
 		} else {
-			sql.append(" SET ");
+			int start = sql.length();
 			List<IParameterMapper> parameters = operationMapper.getParameters();
+			
 			for(int i = 0; i < operationMapper.getWhereAt(); i++) {
-				if(i > 0) {
-					sql.append(",");
-				}
 				IParameterMapper param = parameters.get(i);
+				boolean ignoreNull = operationMapper.isIgnoreNull() || param.isIgnoreNull();
+				Object value = runtime.getParameters().get(param.getOriginalName());
+				
+				if(ignoreNull
+						&& value == null) {
+					continue;
+				}
+				if(sql.length() == start) {
+					sql.append(" SET ");
+				}
 				sql.append(param.getName());
 				sql.append(" = :");
 				sql.append(param.getOriginalName());
+				sql.append(",");
+			}
+			
+			if(sql.length() == start) {
+				throw new InvalidDataAccessApiUsageException("Update is ignore null, must have least 1 non-null parameter.");
+			}
+			
+			if(sql.charAt(sql.length() - 1) == ',') {
+				sql.setLength(sql.length() - 1);
 			}
 			super.applyConditions(operationMapper, runtime, sql);
 		}

@@ -18,8 +18,8 @@ public class ExpandableParameterMapper extends ParameterMapper implements IExpan
 	
 	private List<IParameterMapper> expendedParameters;
 
-	public ExpandableParameterMapper(SQLParam original, Class<?> type) {
-		super(original, type, null);
+	public ExpandableParameterMapper(IOperationMapper operationMapper, SQLParam original, Class<?> type) {
+		super(operationMapper, original, type, null);
 	}
 
 	@Override

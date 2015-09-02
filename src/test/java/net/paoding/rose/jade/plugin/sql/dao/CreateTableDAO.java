@@ -11,7 +11,7 @@ public interface CreateTableDAO {
 
     String create_user_info_table = "create table user_info "
                                     + "(id bigint IDENTITY not null primary key"
-                                    + ",name varchar(200) not null "
+                                    + ",name varchar(200) null "
                                     + ",group_id bigint not null"
                                     + ",birthday datetime not null" + ",age int not null"
                                     + ",money decimal(20,2) not null"

@@ -16,6 +16,7 @@ import java.util.List;
 
 import net.paoding.rose.jade.annotation.SQLParam;
 import net.paoding.rose.jade.plugin.sql.GenericDAO;
+import net.paoding.rose.jade.plugin.sql.Plum;
 import net.paoding.rose.jade.plugin.sql.annotations.IgnoreNull;
 import net.paoding.rose.jade.statement.StatementMetaData;
 
@@ -35,7 +36,7 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 	
 	private Class<?> primaryKeyType;
 	
-	private boolean ignoreNull = true;
+	private IgnoreNull ignoreNull;
 	
 	public static final List<IParameterMapper> NO_PARAMETER = Collections.unmodifiableList(new ArrayList<IParameterMapper>());
 	
@@ -50,10 +51,7 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 
 	@Override
 	protected void doMap() {
-		IgnoreNull ignoreNull = original.getAnnotation(IgnoreNull.class);
-		if(ignoreNull != null) {
-			this.ignoreNull = ignoreNull.value();
-		}
+		ignoreNull = original.getAnnotation(IgnoreNull.class);
 		mapGenericEntityType();
 		mapTargetEntityMapper();
 		mapParameters();
@@ -156,15 +154,14 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 					break;
 				}
 			}
-			
 		}
 		
 		IParameterMapper param = null;
 		if(isExpandableParameterType(type)) {
-			param = new ExpandableParameterMapper(sp, (Class<?>) type);
+			param = new ExpandableParameterMapper(this, sp, (Class<?>) type);
 			((ExpandableParameterMapper) param).setEntityMapperManager(entityMapperManager);
 		} else {
-			param = new ParameterMapper(sp, type, annotations);
+			param = new ParameterMapper(this, sp, type, annotations);
 		}
 		param.map();
 		
@@ -218,7 +215,13 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 		return entityType;
 	}
 
+	@Override
 	public boolean isIgnoreNull() {
+		return ignoreNull == null ? true : Plum.DEFAULT_IGNORE_NULL;
+	}
+
+	@Override
+	public IgnoreNull getIgnoreNull() {
 		return ignoreNull;
 	}
 	
