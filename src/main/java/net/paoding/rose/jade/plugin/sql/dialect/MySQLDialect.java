@@ -6,6 +6,7 @@ package net.paoding.rose.jade.plugin.sql.dialect;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.paoding.rose.jade.plugin.sql.dialect.mysql.DeleteGenerator;
 import net.paoding.rose.jade.plugin.sql.dialect.mysql.InsertGenerator;
 import net.paoding.rose.jade.plugin.sql.dialect.mysql.SelectGenerator;
 import net.paoding.rose.jade.plugin.sql.dialect.mysql.UpdateGenerator;
@@ -25,6 +26,7 @@ public class MySQLDialect implements IDialect {
 		generators.put(IOperationMapper.OPERATION_SELECT, new SelectGenerator());
 		generators.put(IOperationMapper.OPERATION_INSERT, new InsertGenerator());
 		generators.put(IOperationMapper.OPERATION_UPDATE, new UpdateGenerator());
+		generators.put(IOperationMapper.OPERATION_DELETE, new DeleteGenerator());
 	}
 
 	/* (non-Javadoc)
