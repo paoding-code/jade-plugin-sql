@@ -117,10 +117,6 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 		
 		sql.append(param.getName());
 		
-		if(op == Operator.IN) {
-			sql.append("(");
-		}
-		
 		if(op != Operator.LIKE
 				&& op != Operator.EQ
 				&& op != Operator.IN) {
@@ -136,13 +132,15 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 			} else {
 				// Normally, the "like", "in" or "=" condition only once at the same column.
 				sql.append(OPERATORS.get(op));
+				if(op == Operator.IN) {
+					sql.append("(");
+				}
 				sql.append(":");
 				sql.append(param.getOriginalName());
+				if(op == Operator.IN) {
+					sql.append(")");
+				}
 			}
-		}
-		
-		if(op == Operator.IN) {
-			sql.append(")");
 		}
 		
 		return sql.toString();
