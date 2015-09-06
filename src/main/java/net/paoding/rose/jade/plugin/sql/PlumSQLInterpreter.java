@@ -16,6 +16,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 
 import net.paoding.rose.jade.annotation.SQL;
+import net.paoding.rose.jade.plugin.sql.annotations.Table;
 import net.paoding.rose.jade.plugin.sql.dialect.IDialect;
 import net.paoding.rose.jade.plugin.sql.dialect.MySQLDialect;
 import net.paoding.rose.jade.plugin.sql.mapper.EntityMapperManager;
@@ -23,6 +24,7 @@ import net.paoding.rose.jade.plugin.sql.mapper.IOperationMapper;
 import net.paoding.rose.jade.plugin.sql.mapper.OperationMapperManager;
 import net.paoding.rose.jade.plugin.sql.util.BasicSQLFormatter;
 import net.paoding.rose.jade.plugin.sql.util.PlumUtils;
+import net.paoding.rose.jade.statement.DAOMetaData;
 import net.paoding.rose.jade.statement.Interpreter;
 import net.paoding.rose.jade.statement.StatementMetaData;
 import net.paoding.rose.jade.statement.StatementRuntime;
@@ -70,12 +72,12 @@ public class PlumSQLInterpreter implements Interpreter, InitializingBean, Applic
         if (logger.isInfoEnabled()) {
             String[] beanNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(//
                 applicationContext, GenericDAO.class);
-            logger.info("[jade-plugin-sql] found " + beanNames.length + " GenericDAOs: " + Arrays.toString(beanNames));
+            logger.info("[jade-plugin-sql] found " + beanNames.length + " GenericDAOs: "
+                        + Arrays.toString(beanNames));
         }
 
     }
 
-    
     /**
      * 对 {@link GenericDAO} 及其子DAO接口中没有注解&reg;SQL或仅仅&reg;SQL("")的方法进行解析，根据实际参数情况自动动态生成SQL语句
      */
@@ -88,15 +90,16 @@ public class PlumSQLInterpreter implements Interpreter, InitializingBean, Applic
             synchronized (smd) {
                 interpreter = smd.getAttribute(interpreterAttribute);
                 if (interpreter == null) {
-                    interpreter = DO_NOTHING;
+                    interpreter = PassThroughInterpreter;
                     if (GenericDAO.class.isAssignableFrom(smd.getDAOMetaData().getDAOClass())) {
+                        interpreter = VariableResolverInterpreter;
                         SQL sqlAnnotation = smd.getMethod().getAnnotation(SQL.class);
                         if (sqlAnnotation == null // 没有注解@SQL
                             || PlumUtils.isBlank(sqlAnnotation.value()) // 虽注解但没有写SQL
                             || "jade-plugin-sql".equals(sqlAnnotation.value())) // 明确表示使用jade-plugin-sql
                         {
                             IOperationMapper mapper = operationMapperManager.create(smd);
-                            interpreter = new PlumSQLInterpreterWorker(mapper);
+                            interpreter = new SQLGeneratorInterpreter(mapper);
                         }
                     }
                     smd.setAttribute(interpreterAttribute, interpreter);
@@ -107,14 +110,26 @@ public class PlumSQLInterpreter implements Interpreter, InitializingBean, Applic
     }
 
     /**
+     * 透传SQL解析器
+     */
+    private static final Interpreter PassThroughInterpreter = new Interpreter() {
+
+        @Override
+        public void interpret(StatementRuntime runtime) {
+            //
+        }
+
+    };
+
+    /**
      * 实际SQL解析器
      *
      */
-    private class PlumSQLInterpreterWorker implements Interpreter {
+    private class SQLGeneratorInterpreter implements Interpreter {
 
         final IOperationMapper operationMapper;
 
-        public PlumSQLInterpreterWorker(IOperationMapper operationMapper) {
+        public SQLGeneratorInterpreter(IOperationMapper operationMapper) {
             this.operationMapper = operationMapper;
         }
 
@@ -136,13 +151,79 @@ public class PlumSQLInterpreter implements Interpreter, InitializingBean, Applic
     };
 
     /**
-     * 空的SQL解析器
+     * 变量解析器（表名、主键名等）
+     * -- 以下为临时性hardcode代码，不可维护的代码，不和谐的代码，搬到哪里去才能漂亮呢？@Alan
      */
-    private static final Interpreter DO_NOTHING = new Interpreter() {
+    private static final Interpreter VariableResolverInterpreter = new Interpreter() {
 
         @Override
         public void interpret(StatementRuntime runtime) {
-            // do nothing
+            // 临时hard代码2-1：获取table_name替换原始SQL中的{table_name}变量
+            String sql = runtime.getSQL();
+            // 替换表名
+            if (sql.contains("{table_name}")) {
+                StatementMetaData smd = runtime.getMetaData();
+                DAOMetaData dmd = smd.getDAOMetaData();
+                final String tableNameAttribute = "jade-plugin-sql.interpreter";
+                String tableName = dmd.getAttribute(tableNameAttribute);
+                if (tableName == null) {
+                    Class<?> entityType = smd.getDAOMetaData().resolveTypeVariable(//
+                        GenericDAO.class, "E");
+                    Table tableAnnotation = entityType.getAnnotation(Table.class);
+                    if (tableAnnotation != null) {
+                        tableName = tableAnnotation.value();
+                    }
+                    if (PlumUtils.isBlank(tableName)) {
+                        tableName = entityType.getSimpleName().substring(0,
+                            entityType.getSimpleName().length() - 2);
+                        tableName = generateName(tableName);
+                    }
+                    dmd.setAttribute(tableNameAttribute, tableName);
+                }
+                sql = sql.replace("{table_name}", tableName);
+                runtime.setSQL(sql);
+            }
+            // 替换主键
+            if (sql.contains("{primary_key}")) {
+                //TODO: 假装pk都是“id”
+                sql = sql.replace("{primary_key}", "id");
+                runtime.setSQL(sql);
+            }
+
+            // 临时hard代码2-1结束
+
+        }
+
+        // 临时代码2-2，copied from AbstractMapper#generateName
+        private String generateName(String source) {
+            if (PlumUtils.isBlank(source)) {
+                return null;
+            }
+
+            if (source.matches("^[a-zA-Z\\\\.]+$")) {
+                StringBuilder result = new StringBuilder();
+
+                for (int i = 0; i < source.length(); i++) {
+                    char c = source.charAt(i);
+
+                    if (Character.isWhitespace(c)) {
+                        continue;
+                    }
+
+                    if (Character.isUpperCase(c)) {
+                        if (result.length() > 0) {
+                            result.append("_");
+                        }
+                        result.append(Character.toLowerCase(c));
+                    } else {
+                        result.append(c);
+                    }
+                }
+
+                return result.toString();
+            } else {
+                throw new IllegalArgumentException("Illegal naming conventions.");
+            }
         }
     };
 

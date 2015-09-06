@@ -4,14 +4,14 @@
     <groupId>net.paoding</groupId>
     <artifactId>jade-plugin-sql</artifactId>
     <packaging>jar</packaging>
-    <version>0.0.2</version>
+    <version>0.0.1-SNAPSHOT</version>
     <name>jade-plugin-sql</name>
 
     <!-- parent -->
     <parent>
         <groupId>net.paoding</groupId>
         <artifactId>paoding-rose-parent</artifactId>
-        <version>2.0.u03</version>
+        <version>2.0.u04</version>
     </parent>
 
     <!-- 开发人员说明 -->

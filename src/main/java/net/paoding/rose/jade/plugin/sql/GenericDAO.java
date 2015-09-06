@@ -6,6 +6,7 @@ package net.paoding.rose.jade.plugin.sql;
 import java.util.List;
 
 import net.paoding.rose.jade.annotation.ReturnGeneratedKeys;
+import net.paoding.rose.jade.annotation.SQL;
 import net.paoding.rose.jade.annotation.SQLParam;
 
 /**
@@ -47,5 +48,6 @@ public interface GenericDAO<E, ID> {
      * 物理删除实体
      * @param id
      */
+    @SQL("delete from {table_name} where {primary_key} = :1")
     boolean delete(ID id);
 }
