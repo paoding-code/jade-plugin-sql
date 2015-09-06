@@ -3,9 +3,15 @@
  */
 package net.paoding.rose.jade.plugin.sql;
 
+import java.util.Arrays;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 
@@ -27,9 +33,11 @@ import net.paoding.rose.jade.statement.StatementRuntime;
  * @author Alan.Geng[gengzhi718@gmail.com]
  */
 @Order(-1)
-public class PlumSQLInterpreter implements Interpreter, InitializingBean {
+public class PlumSQLInterpreter implements Interpreter, InitializingBean, ApplicationContextAware {
 
     private static final Log logger = LogFactory.getLog(PlumSQLInterpreter.class);
+
+    private ApplicationContext applicationContext;
 
     private OperationMapperManager operationMapperManager;
 
@@ -44,19 +52,32 @@ public class PlumSQLInterpreter implements Interpreter, InitializingBean {
     }
 
     @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
+    @Override
     public void afterPropertiesSet() throws Exception {
         if (operationMapperManager == null) {
             operationMapperManager = new OperationMapperManager();
             operationMapperManager.setEntityMapperManager(new EntityMapperManager());
         }
         if (dialect == null) {
-            // 未来：不同的DAO方法可以有不同的Dialect哦，而且是自动知道，不需要外部设置。
+            // 将来可能扩展点:不同的DAO可以有不同的Dialect哦，而且是自动知道，不需要外部设置。
             dialect = new MySQLDialect();
         }
+        // 
+        if (logger.isInfoEnabled()) {
+            String[] beanNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(//
+                applicationContext, GenericDAO.class);
+            logger.info("[jade-plugin-sql] found " + beanNames.length + " GenericDAOs: " + Arrays.toString(beanNames));
+        }
+
     }
 
-    /* (non-Javadoc)
-     * @see net.paoding.rose.jade.statement.Interpreter#interpret(net.paoding.rose.jade.statement.StatementRuntime)
+    
+    /**
+     * 对 {@link GenericDAO} 及其子DAO接口中没有注解&reg;SQL或仅仅&reg;SQL("")的方法进行解析，根据实际参数情况自动动态生成SQL语句
      */
     @Override
     public void interpret(StatementRuntime runtime) {
@@ -72,8 +93,10 @@ public class PlumSQLInterpreter implements Interpreter, InitializingBean {
                         SQL sqlAnnotation = smd.getMethod().getAnnotation(SQL.class);
                         if (sqlAnnotation == null // 没有注解@SQL
                             || PlumUtils.isBlank(sqlAnnotation.value()) // 虽注解但没有写SQL
-                            || "jade-plugin-sql".equals(sqlAnnotation.value())) {// 明确表示使用jade-plugin-sql
-                            interpreter = new RealInterpreter(operationMapperManager.create(smd));
+                            || "jade-plugin-sql".equals(sqlAnnotation.value())) // 明确表示使用jade-plugin-sql
+                        {
+                            IOperationMapper mapper = operationMapperManager.create(smd);
+                            interpreter = new PlumSQLInterpreterWorker(mapper);
                         }
                     }
                     smd.setAttribute(interpreterAttribute, interpreter);
@@ -83,10 +106,15 @@ public class PlumSQLInterpreter implements Interpreter, InitializingBean {
         interpreter.interpret(runtime);
     }
 
-    private class RealInterpreter implements Interpreter {
+    /**
+     * 实际SQL解析器
+     *
+     */
+    private class PlumSQLInterpreterWorker implements Interpreter {
+
         final IOperationMapper operationMapper;
 
-        public RealInterpreter(IOperationMapper operationMapper) {
+        public PlumSQLInterpreterWorker(IOperationMapper operationMapper) {
             this.operationMapper = operationMapper;
         }
 
@@ -107,6 +135,9 @@ public class PlumSQLInterpreter implements Interpreter, InitializingBean {
 
     };
 
+    /**
+     * 空的SQL解析器
+     */
     private static final Interpreter DO_NOTHING = new Interpreter() {
 
         @Override

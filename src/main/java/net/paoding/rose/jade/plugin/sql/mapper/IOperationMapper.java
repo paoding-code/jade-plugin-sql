@@ -27,10 +27,10 @@ public interface IOperationMapper extends IMapper<StatementMetaData> {
 	};
 	
 	static final String OPERATION_PREFIX[][] = {
-		{"get", "find"},
-		{"save", "insert"},
-		{"delete", "remove"},
-		{"update"}
+		/* [0][] = SELECT */ {"get", "find", "query"},
+		/* [1][] = INSERT */ {"save", "insert"},
+		/* [2][] = DELETE */ {"delete", "remove"},
+		/* [3][] = UPDATE */ {"update", "modify"}
 	};
 	
 	IEntityMapper getTargetEntityMapper();
