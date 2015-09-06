@@ -4,7 +4,7 @@
     <groupId>net.paoding</groupId>
     <artifactId>jade-plugin-sql</artifactId>
     <packaging>jar</packaging>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.1.u02</version>
     <name>jade-plugin-sql</name>
 
     <!-- parent -->
