@@ -7,7 +7,6 @@ import java.util.List;
 
 import net.paoding.rose.jade.annotation.DAO;
 import net.paoding.rose.jade.annotation.SQLParam;
-import net.paoding.rose.jade.plugin.sql.GenericDAO;
 import net.paoding.rose.jade.plugin.sql.Order;
 import net.paoding.rose.jade.plugin.sql.annotations.Ge;
 import net.paoding.rose.jade.plugin.sql.annotations.IgnoreNull;
@@ -31,7 +30,7 @@ import net.paoding.rose.jade.plugin.sql.model.UserInfoDO;
  * spring框架将自动注入一个自动生成的实现。
  */
 @DAO
-public interface UserInfoDAO extends GenericDAO<UserInfoDO, Long> {
+public interface UserInfoDAO extends BaseDAO<UserInfoDO, Long> {
 
 	/**
 	 * 指定字段查询
