@@ -59,14 +59,17 @@ public class EntityMapper extends AbstractMapper<Class<?>> implements IEntityMap
 	}
 	
 	protected List<IColumnMapper> generateColumns() {
-		Field[] fields = original.getDeclaredFields();
+		Class<?> entityClass = original;
 		List<IColumnMapper> columns = new ArrayList<IColumnMapper>();
 		
-		
-		for(Field field : fields) {
-			if(field.isAnnotationPresent(Column.class)) {
-				columns.add(createColumnMapper(field));
+		while(entityClass != Object.class) {
+			Field[] entityFields = entityClass.getDeclaredFields();
+			for(Field entityField : entityFields) {
+				if(entityField.isAnnotationPresent(Column.class)) {
+					columns.add(createColumnMapper(entityField));
+				}
 			}
+			entityClass = entityClass.getSuperclass();
 		}
 		
 		if(columns.size() == 0) {
