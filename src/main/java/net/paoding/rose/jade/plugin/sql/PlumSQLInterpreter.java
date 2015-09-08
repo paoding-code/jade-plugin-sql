@@ -92,13 +92,16 @@ public class PlumSQLInterpreter implements Interpreter, InitializingBean, Applic
                 if (interpreter == null) {
                     interpreter = PassThroughInterpreter;
                     if (GenericDAO.class.isAssignableFrom(smd.getDAOMetaData().getDAOClass())) {
-                        interpreter = VariableResolverInterpreter;
                         SQL sqlAnnotation = smd.getMethod().getAnnotation(SQL.class);
                         if (sqlAnnotation == null // 没有注解@SQL
                             || PlumUtils.isBlank(sqlAnnotation.value()) // 虽注解但没有写SQL
                             || "jade-plugin-sql".equals(sqlAnnotation.value())) // 明确表示使用jade-plugin-sql
                         {
+                            // 将表名、主键名放入DAO的attributes中
+                            putExtraAttributes(smd.getDAOMetaData());
+                            // 创建 IOperationMapper
                             IOperationMapper mapper = operationMapperManager.create(smd);
+                            // 生成最后的解析器
                             interpreter = new SQLGeneratorInterpreter(mapper);
                         }
                     }
@@ -150,81 +153,63 @@ public class PlumSQLInterpreter implements Interpreter, InitializingBean, Applic
 
     };
 
+    // 以下是临时代码 @Alan
     /**
      * 变量解析器（表名、主键名等）
-     * -- 以下为临时性hardcode代码，不可维护的代码，不和谐的代码，搬到哪里去才能漂亮呢？@Alan
      */
-    private static final Interpreter VariableResolverInterpreter = new Interpreter() {
-
-        @Override
-        public void interpret(StatementRuntime runtime) {
-            // 临时hard代码2-1：获取table_name替换原始SQL中的{table_name}变量
-            String sql = runtime.getSQL();
-            // 替换表名
-            if (sql.contains("{table_name}")) {
-                StatementMetaData smd = runtime.getMetaData();
-                DAOMetaData dmd = smd.getDAOMetaData();
-                final String tableNameAttribute = "jade-plugin-sql.interpreter";
-                String tableName = dmd.getAttribute(tableNameAttribute);
-                if (tableName == null) {
-                    Class<?> entityType = smd.getDAOMetaData().resolveTypeVariable(//
-                        GenericDAO.class, "E");
-                    Table tableAnnotation = entityType.getAnnotation(Table.class);
-                    if (tableAnnotation != null) {
-                        tableName = tableAnnotation.value();
-                    }
-                    if (PlumUtils.isBlank(tableName)) {
-                        tableName = entityType.getSimpleName().substring(0,
-                            entityType.getSimpleName().length() - 2);
-                        tableName = generateName(tableName);
-                    }
-                    dmd.setAttribute(tableNameAttribute, tableName);
-                }
-                sql = sql.replace("{table_name}", tableName);
-                runtime.setSQL(sql);
+    protected void putExtraAttributes(DAOMetaData md) {
+        synchronized (md) {
+            if (md.getAttribute("table_name") != null) {
+                return;
             }
-            // 替换主键
-            if (sql.contains("{primary_key}")) {
-                //TODO: 假装pk都是“id”
-                sql = sql.replace("{primary_key}", "id");
-                runtime.setSQL(sql);
+            Class<?> entityType = md.resolveTypeVariable(//
+                GenericDAO.class, "E");
+            Table tableAnnotation = entityType.getAnnotation(Table.class);
+            String tableName = null;
+            if (tableAnnotation != null) {
+                tableName = tableAnnotation.value();
             }
+            if (PlumUtils.isBlank(tableName)) {
+                tableName = entityType.getSimpleName().substring(0,
+                    entityType.getSimpleName().length() - 2);
+                tableName = generateName(tableName);
+            }
+            md.setAttribute("{table_name}", tableName);
+            md.setAttribute("{primary_key}", "id"); // 当前阶段，假装primary_key都是id
+        }
+    }
 
-            // 临时hard代码2-1结束
-
+    // 以下是临时代码
+    // copied from AbstractMapper#generateName
+    protected String generateName(String source) {
+        if (PlumUtils.isBlank(source)) {
+            return null;
         }
 
-        // 临时代码2-2，copied from AbstractMapper#generateName
-        private String generateName(String source) {
-            if (PlumUtils.isBlank(source)) {
-                return null;
-            }
+        if (source.matches("^[a-zA-Z\\\\.]+$")) {
+            StringBuilder result = new StringBuilder();
 
-            if (source.matches("^[a-zA-Z\\\\.]+$")) {
-                StringBuilder result = new StringBuilder();
+            for (int i = 0; i < source.length(); i++) {
+                char c = source.charAt(i);
 
-                for (int i = 0; i < source.length(); i++) {
-                    char c = source.charAt(i);
-
-                    if (Character.isWhitespace(c)) {
-                        continue;
-                    }
-
-                    if (Character.isUpperCase(c)) {
-                        if (result.length() > 0) {
-                            result.append("_");
-                        }
-                        result.append(Character.toLowerCase(c));
-                    } else {
-                        result.append(c);
-                    }
+                if (Character.isWhitespace(c)) {
+                    continue;
                 }
 
-                return result.toString();
-            } else {
-                throw new IllegalArgumentException("Illegal naming conventions.");
+                if (Character.isUpperCase(c)) {
+                    if (result.length() > 0) {
+                        result.append("_");
+                    }
+                    result.append(Character.toLowerCase(c));
+                } else {
+                    result.append(c);
+                }
             }
+
+            return result.toString();
+        } else {
+            throw new IllegalArgumentException("Illegal naming conventions.");
         }
-    };
+    }
 
 }

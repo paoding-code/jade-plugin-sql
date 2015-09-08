@@ -126,4 +126,7 @@ public interface UserInfoDAO extends BaseDAO<UserInfoDO, Long> {
 	 */
 	@SQL("update {table_name} set bool_enum=:2 where id=:1")
 	public boolean updateBoolEnum(int id, BooleanEnum bool);
+	
+	@SQL("select * from  {table_name} ")
+	public List<UserInfoDO> findAll();
 }

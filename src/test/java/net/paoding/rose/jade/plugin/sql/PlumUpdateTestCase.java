@@ -53,14 +53,15 @@ public class PlumUpdateTestCase extends AbstractTestCase {
     }
 
     public void testBaseDAOUpdate() {
-        userInfoDAO.updateStatus(1L, 123);
+        UserInfoDO user = userInfoDAO.findAll().get(0);
+        userInfoDAO.updateStatus(user.getId(), 123);
         
-        int status = userInfoDAO.getStatus(1L);
+        int status = userInfoDAO.getStatus(user.getId());
         
         Assert.assertEquals(123, status);
         
 
-        UserInfoDO user = userInfoDAO.get(1L);
+        user = userInfoDAO.get(user.getId());
         System.out.println(JSON.toJSONString(user, SerializerFeature.PrettyFormat));
     }
     
