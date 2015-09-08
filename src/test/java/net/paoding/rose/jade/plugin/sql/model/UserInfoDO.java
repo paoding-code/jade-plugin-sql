@@ -10,6 +10,7 @@ import java.util.Date;
 import net.paoding.rose.jade.plugin.sql.Order.Direction;
 import net.paoding.rose.jade.plugin.sql.annotations.Column;
 import net.paoding.rose.jade.plugin.sql.annotations.Table;
+import net.paoding.rose.jade.plugin.sql.dao.BooleanEnum;
 
 /**
  * @author Alan.Geng[gengzhi718@gmail.com]
@@ -58,6 +59,9 @@ public class UserInfoDO implements Serializable {
 
     @Column
     private Boolean editable;
+
+    @Column
+    private BooleanEnum boolEnum;
 
     // Getter & Setter
 
@@ -139,6 +143,14 @@ public class UserInfoDO implements Serializable {
 
     public void setLastUpdateTime(Date lastUpdateTime) {
         this.lastUpdateTime = lastUpdateTime;
+    }
+
+    public void setBoolEnum(BooleanEnum boolEnum) {
+        this.boolEnum = boolEnum;
+    }
+
+    public BooleanEnum getBoolEnum() {
+        return boolEnum;
     }
 
 }

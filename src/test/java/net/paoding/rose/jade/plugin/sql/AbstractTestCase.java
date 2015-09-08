@@ -13,6 +13,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import com.alibaba.fastjson.JSON;
 
 import junit.framework.TestCase;
+import net.paoding.rose.jade.plugin.sql.dao.BooleanEnum;
 import net.paoding.rose.jade.plugin.sql.dao.CreateTableDAO;
 import net.paoding.rose.jade.plugin.sql.dao.UserInfoDAO;
 import net.paoding.rose.jade.plugin.sql.model.UserInfoDO;;
@@ -65,6 +66,7 @@ public abstract class AbstractTestCase extends TestCase {
         userInfo.setCreateTime(new Date());
         userInfo.setEditable(true);
         userInfo.setLastUpdateTime(new Date());
+        userInfo.setBoolEnum(BooleanEnum.FALSE);
 
         return userInfo;
     }

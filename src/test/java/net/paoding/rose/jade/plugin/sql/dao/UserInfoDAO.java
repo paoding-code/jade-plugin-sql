@@ -6,6 +6,7 @@ package net.paoding.rose.jade.plugin.sql.dao;
 import java.util.List;
 
 import net.paoding.rose.jade.annotation.DAO;
+import net.paoding.rose.jade.annotation.SQL;
 import net.paoding.rose.jade.annotation.SQLParam;
 import net.paoding.rose.jade.plugin.sql.Order;
 import net.paoding.rose.jade.plugin.sql.annotations.Ge;
@@ -116,4 +117,13 @@ public interface UserInfoDAO extends BaseDAO<UserInfoDO, Long> {
 	 */
 	public void deleteByGroupId(
 			@SQLParam("groupId") Integer groupId);
+	
+	/**
+	 * 测试更新枚举类型（实际存储枚举类型的name值）
+	 * @param id
+	 * @param bool
+	 * @return
+	 */
+	@SQL("update {table_name} set bool_enum=:2 where id=:1")
+	public boolean updateBoolEnum(int id, BooleanEnum bool);
 }

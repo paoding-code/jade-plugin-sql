@@ -13,6 +13,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import junit.framework.Assert;
+import net.paoding.rose.jade.plugin.sql.dao.BooleanEnum;
 import net.paoding.rose.jade.plugin.sql.dao.UserInfoDAO;
 import net.paoding.rose.jade.plugin.sql.model.UserInfoDO;
 
@@ -24,19 +25,32 @@ public class PlumUpdateTestCase extends AbstractTestCase {
 
 	@Autowired
 	private UserInfoDAO userInfoDAO;
-	
-	public void testUpdate() {
-		UserInfoDO contract = new UserInfoDO();
-		
-		contract.setId(1L);
-		contract.setLastUpdateTime(new Date());
-		contract.setName("Alan.Geng");
-		
-		System.out.println(userInfoDAO.update(contract));
-		
-		UserInfoDO user = userInfoDAO.get(1L);
-		System.out.println(JSON.toJSONString(user, SerializerFeature.PrettyFormat));
-	}
+    
+    public void testUpdate() {
+        UserInfoDO contract = new UserInfoDO();
+        
+        contract.setId(1L);
+        contract.setLastUpdateTime(new Date());
+        contract.setName("Alan.Geng");
+        
+        System.out.println(userInfoDAO.update(contract));
+        
+        UserInfoDO user = userInfoDAO.get(1L);
+        System.out.println(JSON.toJSONString(user, SerializerFeature.PrettyFormat));
+    }
+    
+    public void testUpdateEnum() {
+
+        userInfoDAO.updateBoolEnum(1, BooleanEnum.TRUE);
+
+        UserInfoDO user = userInfoDAO.get(1L);
+        System.out.println(JSON.toJSONString(user, SerializerFeature.PrettyFormat));
+        //
+        userInfoDAO.updateBoolEnum(1, BooleanEnum.FALSE);
+
+        UserInfoDO user2 = userInfoDAO.get(1L);
+        System.out.println(JSON.toJSONString(user2, SerializerFeature.PrettyFormat));
+    }
 
     public void testBaseDAOUpdate() {
         userInfoDAO.updateStatus(1L, 123);

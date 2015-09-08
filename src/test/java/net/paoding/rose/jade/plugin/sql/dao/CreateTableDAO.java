@@ -18,7 +18,9 @@ public interface CreateTableDAO {
                                     + ",create_time datetime not null"
                                     + ",last_update_time timestamp not null"
                                     + ",status int not null"
-                                    + ",editable int not null" + ");";
+                                    + ",editable int not null"
+                                    + ",bool_enum varchar(10) not null"
+                                    + ");";
 
     @SQL(create_user_info_table)
     public void createUserInfoTable();

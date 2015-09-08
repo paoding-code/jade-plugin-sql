@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 
+import net.paoding.rose.jade.plugin.sql.dao.BooleanEnum;
 import net.paoding.rose.jade.plugin.sql.dao.UserInfoDAO;
 import net.paoding.rose.jade.plugin.sql.model.UserInfoDO;
 
@@ -62,6 +63,7 @@ public class PlumInsertTestCase extends AbstractTestCase {
         userInfo.setCreateTime(new Date());
         userInfo.setEditable(true);
         userInfo.setLastUpdateTime(new Date());
+        userInfo.setBoolEnum(BooleanEnum.TRUE);
 
         return userInfo;
     }
