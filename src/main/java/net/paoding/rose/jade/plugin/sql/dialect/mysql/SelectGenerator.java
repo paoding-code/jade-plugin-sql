@@ -40,7 +40,7 @@ public class SelectGenerator extends ConditionalGenerator {
 		sql.append(" ");
 		
 		if(operationMapper.isCountQuery()) {
-			sql.append(" COUNT(*)");
+			sql.append("COUNT(*)");
 		} else {
 			List<IColumnMapper> columns = targetEntityMapper.getColumns();
 			
