@@ -36,18 +36,23 @@ public class SelectGenerator extends ConditionalGenerator {
 	protected void beforeApplyConditions(ConditionalOperationMapper operationMapper, StatementRuntime runtime, StringBuilder sql) {
 		super.beforeApplyConditions(operationMapper, runtime, sql);
 		IEntityMapper targetEntityMapper = operationMapper.getTargetEntityMapper();
-		List<IColumnMapper> columns = targetEntityMapper.getColumns();
-		
 		sql.append(operationMapper.getName());
 		sql.append(" ");
 		
-		for(IColumnMapper col : columns) {
-			String name = col.getName();
-			sql.append(name);
-			sql.append(",");
+		if(operationMapper.isCountQuery()) {
+			sql.append(" COUNT(*)");
+		} else {
+			List<IColumnMapper> columns = targetEntityMapper.getColumns();
+			
+			for(IColumnMapper col : columns) {
+				String name = col.getName();
+				sql.append(name);
+				sql.append(",");
+			}
+			
+			sql.setLength(sql.length() - 1);
 		}
 		
-		sql.setLength(sql.length() - 1);
 		sql.append(" FROM ");
 		sql.append(targetEntityMapper.getName());
 	}
@@ -55,12 +60,18 @@ public class SelectGenerator extends ConditionalGenerator {
 	@Override
 	protected void afterApplyConditions(ConditionalOperationMapper operationMapper, StatementRuntime runtime, StringBuilder sql) {
 		super.afterApplyConditions(operationMapper, runtime, sql);
-		applyOrderBy(operationMapper, runtime, sql);
+		
+		if(!operationMapper.isCountQuery()) {
+			// 节省数据库性能开销，count操作不需要orderBy。
+			applyOrderBy(operationMapper, runtime, sql);
+		}
+		
 		applyRange(operationMapper, runtime, sql);
 	}
 	
 	protected void applyOrderBy(ConditionalOperationMapper operationMapper, StatementRuntime runtime, StringBuilder sql) {
-		if(operationMapper.containsOrder()) {
+		if(operationMapper.containsOrder()
+				&& !operationMapper.isPrimaryKeyMode()) {
 			IEntityMapper targetEntityMapper = operationMapper.getTargetEntityMapper();
 			
 			Order order = null;

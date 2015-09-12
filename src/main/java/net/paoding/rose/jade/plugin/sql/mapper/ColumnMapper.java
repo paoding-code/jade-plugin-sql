@@ -7,6 +7,8 @@ import java.lang.reflect.Field;
 
 import net.paoding.rose.jade.plugin.sql.Order.Direction;
 import net.paoding.rose.jade.plugin.sql.annotations.Column;
+import net.paoding.rose.jade.plugin.sql.id.IDGenerator;
+import net.paoding.rose.jade.plugin.sql.id.NonID;
 import net.paoding.rose.jade.plugin.sql.util.PlumUtils;
 
 /**
@@ -44,13 +46,19 @@ public class ColumnMapper extends AbstractMapper<Field> implements IColumnMapper
 		return super.generateName(source);
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean isPrimaryKey() {
-		return annotation.pk();
+		return annotation.id() != NonID.class || annotation.pk();
 	}
 	
 	public Direction getDefaultOrderDirection() {
 		return defaultOrderDirection;
+	}
+	
+	@Override
+	public Class<? extends IDGenerator<?>> getIDGeneratorType() {
+		return annotation != null ? annotation.id() : null;
 	}
 
 }

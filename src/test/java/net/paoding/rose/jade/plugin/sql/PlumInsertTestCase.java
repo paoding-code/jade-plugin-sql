@@ -36,10 +36,10 @@ public class PlumInsertTestCase extends AbstractTestCase {
 	public void testInsert() {
 		UserInfoDO userInfo = createUserInfoDO(102, 30);
 		
-		Long id = userInfoDAO.save(userInfo);
+		userInfoDAO.save(userInfo);
 		
 		
-		System.out.println(JSON.toJSONString(userInfoDAO.get(id), SerializerFeature.PrettyFormat));
+		System.out.println(JSON.toJSONString(userInfoDAO.findByGroupId(102L), SerializerFeature.PrettyFormat));
 	}
 	
 	public void testBatchInsert() {

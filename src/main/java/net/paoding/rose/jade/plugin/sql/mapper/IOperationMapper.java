@@ -45,4 +45,6 @@ public interface IOperationMapper extends IMapper<StatementMetaData> {
 	
 	IgnoreNull getIgnoreNull();
 	
+	boolean isCountQuery();
+	
 }

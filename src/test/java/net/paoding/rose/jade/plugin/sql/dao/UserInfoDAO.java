@@ -129,4 +129,6 @@ public interface UserInfoDAO extends BaseDAO<UserInfoDO, Long> {
 	
 	@SQL("select * from  {table_name} ")
 	public List<UserInfoDO> findAll();
+	
+	public Long countByGroupId(@SQLParam("groupId") Integer groupId);
 }

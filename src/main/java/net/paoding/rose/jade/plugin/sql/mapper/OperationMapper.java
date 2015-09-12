@@ -38,6 +38,8 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 	
 	private IgnoreNull ignoreNull;
 	
+	private boolean countQuery;
+	
 	public static final List<IParameterMapper> NO_PARAMETER = Collections.unmodifiableList(new ArrayList<IParameterMapper>());
 	
 	public OperationMapper(StatementMetaData original) {
@@ -52,6 +54,12 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 	@Override
 	protected void doMap() {
 		ignoreNull = original.getAnnotation(IgnoreNull.class);
+		
+		if(original.getMethod().getName().startsWith("count")
+				&& Number.class.isAssignableFrom(original.getReturnType())) {
+			countQuery = true;
+		}
+		
 		mapGenericEntityType();
 		mapTargetEntityMapper();
 		mapParameters();
@@ -135,15 +143,6 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 		throw new MappingException("Unknown type \"" + type + "\".");
 	}
 	
-	protected Type[] getCollectionTypeBounds(Class<?> collectionType) {
-		TypeVariable<?>[] typeParameters = collectionType.getTypeParameters();
-		if(typeParameters.length == 0) {
-			throw new MappingException("The generic type of collection must be specified.");
-		}
-		TypeVariable<?> typeVariable = collectionType.getTypeParameters()[0];
-		return typeVariable.getBounds();
-	}
-	
 	protected IParameterMapper createParameterMapper(Class<?> type, Annotation[] annotations, int index) {
 		SQLParam sp = null;
 		
@@ -223,6 +222,10 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 	@Override
 	public IgnoreNull getIgnoreNull() {
 		return ignoreNull;
+	}
+
+	public boolean isCountQuery() {
+		return countQuery;
 	}
 	
 }

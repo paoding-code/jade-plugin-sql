@@ -7,6 +7,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import net.paoding.rose.jade.plugin.sql.Order.Direction;
+import net.paoding.rose.jade.plugin.sql.id.IDGenerator;
+import net.paoding.rose.jade.plugin.sql.id.NonID;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
@@ -26,9 +28,16 @@ public @interface Column {
 	String value() default "";
 	
 	/**
-	 * 是否为主键，默认false。
+	 * 主键
 	 * @return
 	 */
+	Class<? extends IDGenerator<?>> id() default NonID.class;
+	
+	/**
+	 * 是否为主键
+	 * @return
+	 */
+	@Deprecated
 	boolean pk() default false;
 	
 	/**

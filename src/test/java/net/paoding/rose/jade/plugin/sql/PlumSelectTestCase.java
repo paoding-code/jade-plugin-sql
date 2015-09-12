@@ -72,4 +72,8 @@ public class PlumSelectTestCase extends AbstractTestCase {
 		System.out.println(JSON.toJSONString(userInfos, SerializerFeature.PrettyFormat));
 	}
 	
+	public void testCountByGroupId() {
+		System.out.println(userInfoDAO.countByGroupId(100));
+	}
+	
 }
