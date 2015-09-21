@@ -79,7 +79,7 @@ public class PlumSQLInterpreter implements Interpreter, InitializingBean, Applic
     }
 
     /**
-     * 对 {@link GenericDAO} 及其子DAO接口中没有注解&reg;SQL或仅仅&reg;SQL("")的方法进行解析，根据实际参数情况自动动态生成SQL语句
+     * 对 {@link GenericDAO} 及其子DAO接口中没有注解&#64;SQL或仅仅&#64;SQL("")的方法进行解析，根据实际参数情况自动动态生成SQL语句
      */
     @Override
     public void interpret(StatementRuntime runtime) {
