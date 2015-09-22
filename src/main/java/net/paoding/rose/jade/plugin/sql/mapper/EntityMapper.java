@@ -44,6 +44,10 @@ public class EntityMapper extends AbstractMapper<Class<?>> implements IEntityMap
 		this.primaryKey = new ArrayList<IColumnMapper>(1);
 		
 		for(IColumnMapper col : columns) {
+			if(this.columnsMap.containsKey(col.getOriginal().getName())) {
+				logger.info("More than one name is " + col.getOriginal().getName() + " field was found, the nearest will be received.");
+			}
+			
 			if(col.isPrimaryKey()) {
 				primaryKey.add(col);
 			}

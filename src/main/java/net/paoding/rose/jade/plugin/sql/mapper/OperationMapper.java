@@ -121,7 +121,7 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 			
 			// GenericDAO中的非集合泛型参数，或许是主键或许是实体。
 			GenericDeclaration genericDeclaration = ((TypeVariable<?>) type).getGenericDeclaration();
-			if(genericDeclaration == GenericDAO.class) {
+			if(GenericDAO.class.isAssignableFrom((Class<?>)genericDeclaration)) {
 				Type[] bounds = ((TypeVariable<?>) type).getBounds();
 				
 				if(bounds[0] == Object.class) {

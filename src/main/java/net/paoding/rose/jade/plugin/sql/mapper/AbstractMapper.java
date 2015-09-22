@@ -3,6 +3,9 @@
  */
 package net.paoding.rose.jade.plugin.sql.mapper;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.paoding.rose.jade.plugin.sql.util.PlumUtils;
 
 /**
@@ -20,6 +23,8 @@ public abstract class AbstractMapper<O> implements IMapper<O> {
 	private boolean mapped;
 	
 	public static final char SEPARATOR = '_';
+	
+	protected static Log logger = LogFactory.getLog(IMapper.class);
 	
 	public AbstractMapper(O original) {
 		this.original = original;
