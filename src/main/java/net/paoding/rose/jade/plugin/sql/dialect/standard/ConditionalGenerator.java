@@ -1,7 +1,7 @@
 /**
  * 
  */
-package net.paoding.rose.jade.plugin.sql.dialect.mysql;
+package net.paoding.rose.jade.plugin.sql.dialect.standard;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,13 +41,13 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 	@Override
 	public String generate(ConditionalOperationMapper operationMapper, StatementRuntime runtime) {
 		StringBuilder sql = new StringBuilder();
-		beforeApplyConditions(operationMapper, runtime, sql);
-		applyConditions(operationMapper, runtime, sql);
-		afterApplyConditions(operationMapper, runtime, sql);
+		sql = beforeApplyConditions(operationMapper, runtime, sql);
+		sql = applyConditions(operationMapper, runtime, sql);
+		sql = afterApplyConditions(operationMapper, runtime, sql);
 		return sql.toString();
 	}
 	
-	protected void applyConditions(ConditionalOperationMapper operationMapper, StatementRuntime runtime, StringBuilder sql) {
+	protected StringBuilder applyConditions(ConditionalOperationMapper operationMapper, StatementRuntime runtime, StringBuilder sql) {
 		if(operationMapper.isPrimaryKeyMode()) {
 			sql.append(" WHERE ");
 			List<IColumnMapper> primaryKey = operationMapper.getTargetEntityMapper().getPrimaryKey();
@@ -92,6 +92,7 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 		} else {
 			throw new UnsupportedOperationException("Unknown condition mode.");
 		}
+		return sql;
 	}
 	
 	protected String generateCondition(ConditionalOperationMapper operationMapper, IParameterMapper param, StatementRuntime runtime, int index) {
@@ -146,12 +147,12 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 		return sql.toString();
 	}
 	
-	protected void beforeApplyConditions(ConditionalOperationMapper operationMapper, StatementRuntime runtime, StringBuilder sql) {
-		
+	protected StringBuilder beforeApplyConditions(ConditionalOperationMapper operationMapper, StatementRuntime runtime, StringBuilder sql) {
+		return sql;
 	}
 	
-	protected void afterApplyConditions(ConditionalOperationMapper operationMapper, StatementRuntime runtime, StringBuilder sql) {
-		
+	protected StringBuilder afterApplyConditions(ConditionalOperationMapper operationMapper, StatementRuntime runtime, StringBuilder sql) {
+		return sql;
 	}
 
 }

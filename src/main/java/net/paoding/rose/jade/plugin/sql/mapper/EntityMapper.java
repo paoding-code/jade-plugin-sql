@@ -14,6 +14,7 @@ import net.paoding.rose.jade.plugin.sql.Order.Direction;
 import net.paoding.rose.jade.plugin.sql.Plum;
 import net.paoding.rose.jade.plugin.sql.annotations.Column;
 import net.paoding.rose.jade.plugin.sql.annotations.Table;
+import net.paoding.rose.jade.plugin.sql.id.NativeGenerator;
 import net.paoding.rose.jade.plugin.sql.util.PlumUtils;
 
 /**
@@ -31,6 +32,8 @@ public class EntityMapper extends AbstractMapper<Class<?>> implements IEntityMap
 	private static final String DATA_OBJECT_EXTENSION = "DO";
 	
 	private Order defaultOrder;
+	
+	private boolean containsAutoIncrementPrimaryKey;
 	
 	public EntityMapper(Class<?> from) {
 		super(from);
@@ -50,6 +53,9 @@ public class EntityMapper extends AbstractMapper<Class<?>> implements IEntityMap
 			
 			if(col.isPrimaryKey()) {
 				primaryKey.add(col);
+				if(col.getIDGeneratorType() == NativeGenerator.class) {
+					containsAutoIncrementPrimaryKey = true;
+				}
 			}
 			if(col.getDefaultOrderDirection() != Direction.NONE) {
 				if(defaultOrder == null) {
@@ -124,6 +130,10 @@ public class EntityMapper extends AbstractMapper<Class<?>> implements IEntityMap
 	
 	public Order getDefaultOrder() {
 		return defaultOrder;
+	}
+
+	public boolean containsAutoIncrementPrimaryKey() {
+		return containsAutoIncrementPrimaryKey;
 	}
 
 }

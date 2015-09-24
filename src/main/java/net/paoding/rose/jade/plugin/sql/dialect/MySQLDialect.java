@@ -6,10 +6,10 @@ package net.paoding.rose.jade.plugin.sql.dialect;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.paoding.rose.jade.plugin.sql.dialect.mysql.DeleteGenerator;
-import net.paoding.rose.jade.plugin.sql.dialect.mysql.InsertGenerator;
 import net.paoding.rose.jade.plugin.sql.dialect.mysql.SelectGenerator;
-import net.paoding.rose.jade.plugin.sql.dialect.mysql.UpdateGenerator;
+import net.paoding.rose.jade.plugin.sql.dialect.standard.DeleteGenerator;
+import net.paoding.rose.jade.plugin.sql.dialect.standard.InsertGenerator;
+import net.paoding.rose.jade.plugin.sql.dialect.standard.UpdateGenerator;
 import net.paoding.rose.jade.plugin.sql.mapper.IOperationMapper;
 import net.paoding.rose.jade.statement.StatementRuntime;
 

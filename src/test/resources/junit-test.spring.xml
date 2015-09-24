@@ -14,6 +14,13 @@
         <property name="driverClassName" value="org.hsqldb.jdbc.JDBCDriver" />
         <property name="url" value="jdbc:hsqldb:mem:jade_plugin_sql_db" />
     </bean>
+    
+    <bean id="jade.dataSource.net.paoding.rose.jade.plugin.sql.oracle.dao" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+        <property name="url" value="jdbc:oracle:thin:@101.251.217.102:1521:orayun1" />
+        <property name="username" value="miracle"/>
+        <property name="password" value="miracle"/>
+    </bean>
 
     <!-- Jade -->
     <bean class="net.paoding.rose.jade.context.spring.JadeBeanFactoryPostProcessor" />
@@ -21,7 +28,7 @@
 	<!-- Plum -->
     <bean class="net.paoding.rose.jade.plugin.sql.PlumSQLInterpreter">
         <property name="dialect">
-            <bean class="net.paoding.rose.jade.plugin.sql.dialect.MySQLDialect" />
+            <bean class="net.paoding.rose.jade.plugin.sql.dialect.OracleDialect" />
         </property>
     </bean>
 

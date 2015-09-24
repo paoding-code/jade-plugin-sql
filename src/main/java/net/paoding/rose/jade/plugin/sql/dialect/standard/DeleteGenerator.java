@@ -1,7 +1,7 @@
 /**
  * 
  */
-package net.paoding.rose.jade.plugin.sql.dialect.mysql;
+package net.paoding.rose.jade.plugin.sql.dialect.standard;
 
 import net.paoding.rose.jade.plugin.sql.mapper.ConditionalOperationMapper;
 import net.paoding.rose.jade.statement.StatementRuntime;
@@ -13,13 +13,15 @@ import net.paoding.rose.jade.statement.StatementRuntime;
 public class DeleteGenerator extends ConditionalGenerator {
 
 	@Override
-	protected void beforeApplyConditions(
+	protected StringBuilder beforeApplyConditions(
 			ConditionalOperationMapper operationMapper,
 			StatementRuntime runtime, StringBuilder sql) {
-		super.beforeApplyConditions(operationMapper, runtime, sql);
+		sql = super.beforeApplyConditions(operationMapper, runtime, sql);
 		
 		sql.append("DELETE FROM ");
 		sql.append(operationMapper.getTargetEntityMapper().getName());
+		
+		return sql;
 	}
 
 }

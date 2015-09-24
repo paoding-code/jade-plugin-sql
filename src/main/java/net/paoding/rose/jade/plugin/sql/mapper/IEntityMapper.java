@@ -20,4 +20,6 @@ public interface IEntityMapper extends IMapper<Class<?>> {
 	IColumnMapper getColumnMapperByFieldName(String fieldName);
 
 	Order getDefaultOrder();
+	
+	boolean containsAutoIncrementPrimaryKey();
 }

@@ -29,7 +29,7 @@ public interface GenericDAO<E, ID> {
      * 
      * @return auto increment id
      */
-    @ReturnGeneratedKeys
+    @ReturnGeneratedKeys(AutoIncrementProcessor.class)
     @AfterInvocation(AutoIncrementProcessor.class)
     ID save(@SQLParam("entity") E entity);
 
