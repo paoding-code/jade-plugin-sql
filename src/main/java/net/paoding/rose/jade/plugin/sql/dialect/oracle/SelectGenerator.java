@@ -31,6 +31,10 @@ public class SelectGenerator extends AbstractSelectGenerator {
 		// 在Oracle数据库版本12g之前，limit与offset通过ROWNUM计算，且offset必须使用子查询。
 		Long realOffset = null;
 		
+		if(offset == null) {
+			offset = 0L;
+		}
+		
 		if(offset != null) {
 			realOffset = offset + 1;
 		}
