@@ -25,4 +25,7 @@ public interface IParameterMapper extends IMapper<ParameterOriginal> {
 	boolean isIgnoreNull();
 	
 	IgnoreNull getIgnoreNull();
+	
+	IOperationMapper getOperationMapper();
+	
 }

@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.paoding.rose.jade.annotation.SQLParam;
 import net.paoding.rose.jade.plugin.sql.GenericDAO;
 import net.paoding.rose.jade.plugin.sql.Plum;
 import net.paoding.rose.jade.plugin.sql.annotations.IgnoreNull;
@@ -144,24 +143,14 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 	}
 	
 	protected IParameterMapper createParameterMapper(Class<?> type, Annotation[] annotations, int index) {
-		SQLParam sp = null;
-		
-		if(annotations != null && annotations.length > 0) {
-			for(Annotation annotation : annotations) {
-				if(annotation.annotationType().equals(SQLParam.class)) {
-					sp = (SQLParam) annotation;
-					break;
-				}
-			}
-		}
 		
 		IParameterMapper param = null;
 		if(isExpandableParameterType(type)) {
-			param = new ExpandableParameterMapper(this, sp, (Class<?>) type);
-			((ExpandableParameterMapper) param).setEntityMapperManager(entityMapperManager);
+			param = new ExpandableParameterMapper(this, type, annotations);
 		} else {
-			param = new ParameterMapper(this, sp, type, annotations);
+			param = new ParameterMapper(this, type, annotations);
 		}
+		
 		param.map();
 		
 		return param;

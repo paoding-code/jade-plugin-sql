@@ -64,11 +64,15 @@ public abstract class AbstractSelectGenerator extends ConditionalGenerator {
 			String name = col.getName();
 			sql.append(name);
 			sql.append(" ");
-			sql.append(col.getOriginal().getName());
+			sql.append(getColumnAlias(col));
 			sql.append(",");
 		}
 		
 		sql.setLength(sql.length() - 1);
+	}
+	
+	protected String getColumnAlias(IColumnMapper column) {
+		return column.getOriginalName();
 	}
 
 	@Override

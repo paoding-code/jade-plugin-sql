@@ -24,6 +24,8 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 
 	private static final Map<Operator, String> OPERATORS;
 	
+	private boolean containsConditions = false;
+	
 	static {
 		Map<Operator, String> operators = new HashMap<Operator, String>(Operator.values().length);
 		operators.put(Operator.EQ, " = ");
@@ -65,6 +67,8 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 				// TODO:当实体为符合主键并且参数列表中的顺序与实体中字段顺序不一致，则会发生错误。
 				sql.append(i + 1);
 			}
+			
+			containsConditions = true;
 		} else if(operationMapper.isComplexMode()) {
 			List<IParameterMapper> parameters = operationMapper.getParameters();
 			if(PlumUtils.isNotEmpty(parameters)) {
@@ -82,6 +86,7 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 					if(condition != null) {
 						if(and.length() == 0) {
 							sql.append(" WHERE ");
+							containsConditions = true;
 						}
 						sql.append(and);
 						sql.append(condition);
@@ -153,6 +158,10 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 	
 	protected StringBuilder afterApplyConditions(ConditionalOperationMapper operationMapper, StatementRuntime runtime, StringBuilder sql) {
 		return sql;
+	}
+	
+	protected boolean containsConditions() {
+		return containsConditions;
 	}
 
 }

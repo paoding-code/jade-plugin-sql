@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.paoding.rose.jade.annotation.SQLParam;
 import net.paoding.rose.jade.plugin.sql.Plum;
 import net.paoding.rose.jade.plugin.sql.Plum.Operator;
 import net.paoding.rose.jade.plugin.sql.annotations.Eq;
@@ -61,14 +60,18 @@ public class ParameterMapper extends AbstractMapper<ParameterOriginal> implement
 	}
 
 	public ParameterMapper(IParameterMapper parent, IColumnMapper columnMapper) {
-		super(new ParameterOriginal(null, columnMapper.getOriginal().getType(), null));
+		super(new ParameterOriginal(columnMapper.getOriginal().getType(), null));
 		this.parent = parent;
 		this.columnMapper = columnMapper;
 	}
 	
-	public ParameterMapper(IOperationMapper operationMapper, SQLParam original, Class<?> type, Annotation[] annotations) {
-		super(new ParameterOriginal(original, type, annotations));
+	public ParameterMapper(IOperationMapper operationMapper, Class<?> type, Annotation[] annotations) {
+		super(new ParameterOriginal(type, annotations));
 		this.operationMapper = operationMapper;
+		
+		if(getOriginal().getSqlParam() != null) {
+			this.columnMapper = operationMapper.getTargetEntityMapper().getColumnMapperByFieldName(getOriginal().getName());
+		}
 	}
 	
 	@Override
@@ -138,6 +141,19 @@ public class ParameterMapper extends AbstractMapper<ParameterOriginal> implement
 			return operationMapper.getIgnoreNull();
 		}
 		return null;
+	}
+
+	@Override
+	public IOperationMapper getOperationMapper() {
+		return parent != null ? parent.getOperationMapper() : operationMapper;
+	}
+	
+	@Override
+	public String getName() {
+		if(columnMapper != null) {
+			return columnMapper.getName();
+		}
+		return super.getName();
 	}
 	
 }

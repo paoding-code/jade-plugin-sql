@@ -3,10 +3,9 @@
  */
 package net.paoding.rose.jade.plugin.sql.mapper;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
-
-import net.paoding.rose.jade.annotation.SQLParam;
 
 /**
  * @author Alan.Geng[gengzhi718@gmail.com]
@@ -14,13 +13,12 @@ import net.paoding.rose.jade.annotation.SQLParam;
  */
 public class ExpandableParameterMapper extends ParameterMapper implements IExpandableParameterMapper {
 	
-	private EntityMapperManager entityMapperManager;
-	
-	private List<IParameterMapper> expendedParameters;
-
-	public ExpandableParameterMapper(IOperationMapper operationMapper, SQLParam original, Class<?> type) {
-		super(operationMapper, original, type, null);
+	public ExpandableParameterMapper(IOperationMapper operationMapper,
+			Class<?> type, Annotation[] annotations) {
+		super(operationMapper, type, annotations);
 	}
+
+	private List<IParameterMapper> expendedParameters;
 
 	@Override
 	public void doMap() {
@@ -33,7 +31,7 @@ public class ExpandableParameterMapper extends ParameterMapper implements IExpan
 	}
 	
 	protected void mapExpendedParameterMapper() throws Exception {
-		IEntityMapper entityMapper = entityMapperManager.createGet((Class<?>) getType());
+		IEntityMapper entityMapper = getOperationMapper().getTargetEntityMapper();
 		if(entityMapper != null) {
 			List<IColumnMapper> columns = entityMapper.getColumns();
 			expendedParameters = new ArrayList<IParameterMapper>(columns.size());
@@ -47,11 +45,6 @@ public class ExpandableParameterMapper extends ParameterMapper implements IExpan
 		ParameterMapper expended = new ParameterMapper(this, col);
 		expended.map();
 		return expended;
-	}
-
-	@Override
-	public void setEntityMapperManager(EntityMapperManager entityMapperManager) {
-		this.entityMapperManager = entityMapperManager;
 	}
 
 	@Override

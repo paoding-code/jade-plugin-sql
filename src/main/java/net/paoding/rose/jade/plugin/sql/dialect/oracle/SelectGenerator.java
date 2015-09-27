@@ -7,6 +7,7 @@ import java.util.Map;
 
 import net.paoding.rose.jade.plugin.sql.dialect.standard.AbstractSelectGenerator;
 import net.paoding.rose.jade.plugin.sql.mapper.ConditionalOperationMapper;
+import net.paoding.rose.jade.plugin.sql.mapper.IColumnMapper;
 import net.paoding.rose.jade.statement.StatementRuntime;
 
 /**
@@ -29,18 +30,17 @@ public class SelectGenerator extends AbstractSelectGenerator {
 		
 		// 在Oracle数据库版本12g之前，limit与offset通过ROWNUM计算，且offset必须使用子查询。
 		Long realOffset = null;
-		Long realLimit = null;
 		
 		if(offset != null) {
 			realOffset = offset + 1;
 		}
-		if(limit != null) {
-			realLimit = limit + 1;
-		}
 		
 		if(limit != null && limit > 0) {
+			if(containsConditions()) {
+				sql.append(" AND ");
+			}
 			sql.append(" ROWNUM < :__limit");
-			parameters.put("__limit", realLimit);
+			parameters.put("__limit", realOffset + limit);
 		}
 		
 		if(offset != null && offset > 1) {
@@ -54,7 +54,7 @@ public class SelectGenerator extends AbstractSelectGenerator {
 			outerSql.append(ROWNUM_ALIAS);
 			outerSql.append(" >= :__offset");
 			
-			parameters.put("__offset", realOffset + realLimit);
+			parameters.put("__offset", realOffset);
 			
 			sql = outerSql;
 		}
@@ -77,6 +77,15 @@ public class SelectGenerator extends AbstractSelectGenerator {
 				sql.append(ROWNUM_ALIAS);
 			}
 		}
+	}
+	
+	@Override
+	protected String getColumnAlias(IColumnMapper column) {
+		if(column.getName().startsWith("\"")
+				&& column.getName().endsWith("\"")) {
+			return "\"" + super.getColumnAlias(column) + "\"";
+		}
+		return super.getColumnAlias(column);
 	}
 
 }

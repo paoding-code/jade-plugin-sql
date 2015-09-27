@@ -4,6 +4,8 @@
 package net.paoding.rose.jade.plugin.sql;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,6 +47,8 @@ public class PlumSQLInterpreter implements Interpreter, InitializingBean, Applic
 
     private IDialect dialect;
     
+    private Map<String, IDialect> packageScopeDialect;
+    
     public static final String ATTRIBUTE_NAME_INTERPRETER = "jade-plugin-sql.interpreter";
     
     public static final String SQL_ANNOTATION_MARKUP = "jade-plugin-sql";
@@ -72,6 +76,9 @@ public class PlumSQLInterpreter implements Interpreter, InitializingBean, Applic
             // 将来可能扩展点:不同的DAO可以有不同的Dialect哦，而且是自动知道，不需要外部设置。
             dialect = new MySQLDialect();
         }
+        
+        this.loadPackageRegionDialect();
+        
         // 
         if (logger.isInfoEnabled()) {
             String[] beanNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(//
@@ -80,6 +87,19 @@ public class PlumSQLInterpreter implements Interpreter, InitializingBean, Applic
                         + Arrays.toString(beanNames));
         }
 
+    }
+    
+    public void loadPackageRegionDialect() {
+    	String[] dialectBeanNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(applicationContext, IDialect.class);
+    	for(String beanName : dialectBeanNames) {
+    		if(packageScopeDialect == null) {
+    			packageScopeDialect = new HashMap<String, IDialect>();
+    		}
+    		
+    		String packageName = beanName.substring("plum.dialect.".length());
+    		
+    		packageScopeDialect.put(packageName, (IDialect) applicationContext.getBean(beanName));
+    	}
     }
 
     /**
@@ -134,9 +154,27 @@ public class PlumSQLInterpreter implements Interpreter, InitializingBean, Applic
     public class SQLGeneratorInterpreter implements Interpreter {
 
         final IOperationMapper operationMapper;
+        
+        private IDialect dialect;
 
         public SQLGeneratorInterpreter(IOperationMapper operationMapper) {
             this.operationMapper = operationMapper;
+            
+            if(packageScopeDialect != null) {
+            	Class<?> daoClass = operationMapper.getOriginal().getDAOMetaData().getDAOClass();
+            	String daoPkg = daoClass.getPackage().getName();
+            	while(daoPkg.contains(".")
+            			&& (dialect = packageScopeDialect.get(daoPkg)) == null) {
+            		
+            		// Find the package region dialect layer by layer.
+            		daoPkg = daoPkg.substring(0, daoPkg.lastIndexOf("."));
+            	}
+            }
+            
+            if(dialect == null) {
+            	// When miss the dialect in package region, use default.
+            	dialect = PlumSQLInterpreter.this.dialect;
+            }
         }
 
         @Override
