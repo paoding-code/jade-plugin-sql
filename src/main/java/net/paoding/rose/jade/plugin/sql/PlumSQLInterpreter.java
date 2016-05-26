@@ -4,6 +4,8 @@
 package net.paoding.rose.jade.plugin.sql;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,6 +46,12 @@ public class PlumSQLInterpreter implements Interpreter, InitializingBean, Applic
     private OperationMapperManager operationMapperManager;
 
     private IDialect dialect;
+    
+    private Map<String, IDialect> packageScopeDialect;
+    
+    public static final String ATTRIBUTE_NAME_INTERPRETER = "jade-plugin-sql.interpreter";
+    
+    public static final String SQL_ANNOTATION_MARKUP = "jade-plugin-sql";
 
     public void setDialect(IDialect dialect) {
         this.dialect = dialect;
@@ -68,6 +76,9 @@ public class PlumSQLInterpreter implements Interpreter, InitializingBean, Applic
             // 将来可能扩展点:不同的DAO可以有不同的Dialect哦，而且是自动知道，不需要外部设置。
             dialect = new MySQLDialect();
         }
+        
+        this.loadPackageRegionDialect();
+        
         // 
         if (logger.isInfoEnabled()) {
             String[] beanNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(//
@@ -77,25 +88,37 @@ public class PlumSQLInterpreter implements Interpreter, InitializingBean, Applic
         }
 
     }
+    
+    public void loadPackageRegionDialect() {
+    	String[] dialectBeanNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(applicationContext, IDialect.class);
+    	for(String beanName : dialectBeanNames) {
+    		if(packageScopeDialect == null) {
+    			packageScopeDialect = new HashMap<String, IDialect>();
+    		}
+    		
+    		String packageName = beanName.substring("plum.dialect.".length());
+    		
+    		packageScopeDialect.put(packageName, (IDialect) applicationContext.getBean(beanName));
+    	}
+    }
 
     /**
      * 对 {@link GenericDAO} 及其子DAO接口中没有注解&#64;SQL或仅仅&#64;SQL("")的方法进行解析，根据实际参数情况自动动态生成SQL语句
      */
     @Override
     public void interpret(StatementRuntime runtime) {
-        final String interpreterAttribute = "jade-plugin-sql.interpreter";
-        Interpreter interpreter = runtime.getMetaData().getAttribute(interpreterAttribute);
+        Interpreter interpreter = runtime.getMetaData().getAttribute(ATTRIBUTE_NAME_INTERPRETER);
         if (interpreter == null) {
             StatementMetaData smd = runtime.getMetaData();
             synchronized (smd) {
-                interpreter = smd.getAttribute(interpreterAttribute);
+                interpreter = smd.getAttribute(ATTRIBUTE_NAME_INTERPRETER);
                 if (interpreter == null) {
-                    interpreter = PassThroughInterpreter;
+                    interpreter = PASS_THROUGH_INTERPRETER;
                     if (GenericDAO.class.isAssignableFrom(smd.getDAOMetaData().getDAOClass())) {
                         SQL sqlAnnotation = smd.getMethod().getAnnotation(SQL.class);
                         if (sqlAnnotation == null // 没有注解@SQL
                             || PlumUtils.isBlank(sqlAnnotation.value()) // 虽注解但没有写SQL
-                            || "jade-plugin-sql".equals(sqlAnnotation.value())) // 明确表示使用jade-plugin-sql
+                            || SQL_ANNOTATION_MARKUP.equals(sqlAnnotation.value())) // 明确表示使用jade-plugin-sql
                         {
                             // 将表名、主键名放入DAO的attributes中
                             putExtraAttributes(smd.getDAOMetaData());
@@ -105,7 +128,7 @@ public class PlumSQLInterpreter implements Interpreter, InitializingBean, Applic
                             interpreter = new SQLGeneratorInterpreter(mapper);
                         }
                     }
-                    smd.setAttribute(interpreterAttribute, interpreter);
+                    smd.setAttribute(ATTRIBUTE_NAME_INTERPRETER, interpreter);
                 }
             }
         }
@@ -115,7 +138,7 @@ public class PlumSQLInterpreter implements Interpreter, InitializingBean, Applic
     /**
      * 透传SQL解析器
      */
-    private static final Interpreter PassThroughInterpreter = new Interpreter() {
+    private static final Interpreter PASS_THROUGH_INTERPRETER = new Interpreter() {
 
         @Override
         public void interpret(StatementRuntime runtime) {
@@ -128,12 +151,30 @@ public class PlumSQLInterpreter implements Interpreter, InitializingBean, Applic
      * 实际SQL解析器
      *
      */
-    private class SQLGeneratorInterpreter implements Interpreter {
+    public class SQLGeneratorInterpreter implements Interpreter {
 
         final IOperationMapper operationMapper;
+        
+        private IDialect dialect;
 
         public SQLGeneratorInterpreter(IOperationMapper operationMapper) {
             this.operationMapper = operationMapper;
+            
+            if(packageScopeDialect != null) {
+            	Class<?> daoClass = operationMapper.getOriginal().getDAOMetaData().getDAOClass();
+            	String daoPkg = daoClass.getPackage().getName();
+            	while(daoPkg.contains(".")
+            			&& (dialect = packageScopeDialect.get(daoPkg)) == null) {
+            		
+            		// Find the package region dialect layer by layer.
+            		daoPkg = daoPkg.substring(0, daoPkg.lastIndexOf("."));
+            	}
+            }
+            
+            if(dialect == null) {
+            	// When miss the dialect in package region, use default.
+            	dialect = PlumSQLInterpreter.this.dialect;
+            }
         }
 
         @Override
@@ -150,6 +191,10 @@ public class PlumSQLInterpreter implements Interpreter, InitializingBean, Applic
                 throw new InvalidDataAccessApiUsageException(e.getMessage(), e);
             }
         }
+
+		public IOperationMapper getOperationMapper() {
+			return operationMapper;
+		}
 
     };
 

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package net.paoding.rose.jade.plugin.sql.dialect.mysql;
+package net.paoding.rose.jade.plugin.sql.dialect.standard;
 
 import java.util.List;
 

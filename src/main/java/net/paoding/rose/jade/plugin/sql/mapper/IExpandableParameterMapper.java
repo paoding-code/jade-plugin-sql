@@ -13,5 +13,4 @@ public interface IExpandableParameterMapper extends IParameterMapper {
 
 	List<IParameterMapper> expand();
 	
-	void setEntityMapperManager(EntityMapperManager entityMapperManager);
 }

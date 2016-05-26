@@ -9,7 +9,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 查询数据的偏移量
+ * 查询数据的偏移量，从0开始。
  * @author Alan.Geng[gengzhi718@gmail.com]
  */
 @Target(ElementType.PARAMETER)

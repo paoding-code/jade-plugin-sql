@@ -19,10 +19,18 @@ public class ParameterOriginal {
 	
 	private Annotation[] annotations;
 	
-	public ParameterOriginal(SQLParam sqlParam, Class<?> type, Annotation[] annotations) {
-		this.sqlParam = sqlParam;
+	public ParameterOriginal(Class<?> type, Annotation[] annotations) {
 		this.type = type;
 		this.annotations = annotations;
+		
+		if(annotations != null && annotations.length > 0) {
+			for(Annotation annotation : annotations) {
+				if(annotation.annotationType().equals(SQLParam.class)) {
+					sqlParam = (SQLParam) annotation;
+					break;
+				}
+			}
+		}
 	}
 
 	public Class<?> getType() {

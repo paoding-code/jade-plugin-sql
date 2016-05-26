@@ -1,7 +1,7 @@
 /**
  * 
  */
-package net.paoding.rose.jade.plugin.sql.dialect.mysql;
+package net.paoding.rose.jade.plugin.sql.dialect.standard;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,6 +24,8 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 
 	private static final Map<Operator, String> OPERATORS;
 	
+	private boolean containsConditions = false;
+	
 	static {
 		Map<Operator, String> operators = new HashMap<Operator, String>(Operator.values().length);
 		operators.put(Operator.EQ, " = ");
@@ -41,13 +43,13 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 	@Override
 	public String generate(ConditionalOperationMapper operationMapper, StatementRuntime runtime) {
 		StringBuilder sql = new StringBuilder();
-		beforeApplyConditions(operationMapper, runtime, sql);
-		applyConditions(operationMapper, runtime, sql);
-		afterApplyConditions(operationMapper, runtime, sql);
+		sql = beforeApplyConditions(operationMapper, runtime, sql);
+		sql = applyConditions(operationMapper, runtime, sql);
+		sql = afterApplyConditions(operationMapper, runtime, sql);
 		return sql.toString();
 	}
 	
-	protected void applyConditions(ConditionalOperationMapper operationMapper, StatementRuntime runtime, StringBuilder sql) {
+	protected StringBuilder applyConditions(ConditionalOperationMapper operationMapper, StatementRuntime runtime, StringBuilder sql) {
 		if(operationMapper.isPrimaryKeyMode()) {
 			sql.append(" WHERE ");
 			List<IColumnMapper> primaryKey = operationMapper.getTargetEntityMapper().getPrimaryKey();
@@ -69,6 +71,8 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 				    sql.append(i + 1);
 				}
 			}
+			
+			containsConditions = true;
 		} else if(operationMapper.isComplexMode()) {
 			List<IParameterMapper> parameters = operationMapper.getParameters();
 			if(PlumUtils.isNotEmpty(parameters)) {
@@ -86,6 +90,7 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 					if(condition != null) {
 						if(and.length() == 0) {
 							sql.append(" WHERE ");
+							containsConditions = true;
 						}
 						sql.append(and);
 						sql.append(condition);
@@ -96,6 +101,7 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 		} else {
 			throw new UnsupportedOperationException("Unknown condition mode.");
 		}
+		return sql;
 	}
 	
 	protected String generateCondition(ConditionalOperationMapper operationMapper, IParameterMapper param, StatementRuntime runtime, int index) {
@@ -150,12 +156,16 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 		return sql.toString();
 	}
 	
-	protected void beforeApplyConditions(ConditionalOperationMapper operationMapper, StatementRuntime runtime, StringBuilder sql) {
-		
+	protected StringBuilder beforeApplyConditions(ConditionalOperationMapper operationMapper, StatementRuntime runtime, StringBuilder sql) {
+		return sql;
 	}
 	
-	protected void afterApplyConditions(ConditionalOperationMapper operationMapper, StatementRuntime runtime, StringBuilder sql) {
-		
+	protected StringBuilder afterApplyConditions(ConditionalOperationMapper operationMapper, StatementRuntime runtime, StringBuilder sql) {
+		return sql;
+	}
+	
+	protected boolean containsConditions() {
+		return containsConditions;
 	}
 
 }

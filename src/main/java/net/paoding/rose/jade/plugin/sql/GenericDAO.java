@@ -5,9 +5,11 @@ package net.paoding.rose.jade.plugin.sql;
 
 import java.util.List;
 
+import net.paoding.rose.jade.annotation.AfterInvocation;
 import net.paoding.rose.jade.annotation.ReturnGeneratedKeys;
 import net.paoding.rose.jade.annotation.SQL;
 import net.paoding.rose.jade.annotation.SQLParam;
+import net.paoding.rose.jade.plugin.sql.id.AutoIncrementProcessor;
 
 /**
  * @author Alan.Geng[gengzhi718@gmail.com]
@@ -27,7 +29,8 @@ public interface GenericDAO<E, ID> {
      * 
      * @return auto increment id
      */
-    @ReturnGeneratedKeys
+    @ReturnGeneratedKeys(AutoIncrementProcessor.class)
+    @AfterInvocation(AutoIncrementProcessor.class)
     ID save(@SQLParam("entity") E entity);
 
     /**
