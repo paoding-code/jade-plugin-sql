@@ -22,5 +22,5 @@ public interface IDialect {
 	 * @see IOperationMapper
 	 * @see StatementRuntime
 	 */
-	public <T extends IOperationMapper> String translate(T operation, StatementRuntime runtime);
+	public String translate(IOperationMapper operation, StatementRuntime runtime);
 }

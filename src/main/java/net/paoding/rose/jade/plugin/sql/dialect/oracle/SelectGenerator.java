@@ -48,7 +48,7 @@ public class SelectGenerator extends AbstractSelectGenerator {
 		}
 		
 		if(offset != null && offset > 1) {
-			StringBuilder outerSql = new StringBuilder(operationMapper.getName());
+			StringBuilder outerSql = new StringBuilder(operationMapper.getDestName());
 			outerSql.append(" ");
 			applyColumns(operationMapper.getTargetEntityMapper(), outerSql);
 			
@@ -85,8 +85,8 @@ public class SelectGenerator extends AbstractSelectGenerator {
 	
 	@Override
 	protected String getColumnAlias(IColumnMapper column) {
-		if(column.getName().startsWith("\"")
-				&& column.getName().endsWith("\"")) {
+		if(column.getDestName().startsWith("\"")
+				&& column.getDestName().endsWith("\"")) {
 			return "\"" + super.getColumnAlias(column) + "\"";
 		}
 		return super.getColumnAlias(column);

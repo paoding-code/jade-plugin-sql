@@ -35,11 +35,11 @@ public class AutoIncrementProcessor extends DynamicReturnGeneratedKeys implement
 		if(attribute != null) {
 			IOperationMapper operationMapper = attribute.getOperationMapper();
 			
-			if(IOperationMapper.OPERATION_INSERT.equals(operationMapper.getName())) {
+			if(IOperationMapper.OPERATION_INSERT.equals(operationMapper.getDestName())) {
 				IEntityMapper targetEntityMapper = operationMapper.getTargetEntityMapper();
 				
 				if(targetEntityMapper.containsAutoIncrementPrimaryKey()) {
-					String paramName = operationMapper.getParameters().get(0).getName();
+					String paramName = operationMapper.getParameters().get(0).getDestName();
 					
 					if(returnValue.getClass().isArray()) {
 						
@@ -78,7 +78,7 @@ public class AutoIncrementProcessor extends DynamicReturnGeneratedKeys implement
 		if(attribute != null) {
 			IOperationMapper operationMapper = attribute.getOperationMapper();
 			
-			if(IOperationMapper.OPERATION_INSERT.equals(operationMapper.getName())) {
+			if(IOperationMapper.OPERATION_INSERT.equals(operationMapper.getDestName())) {
 				IEntityMapper targetEntityMapper = operationMapper.getTargetEntityMapper();
 				return targetEntityMapper.containsAutoIncrementPrimaryKey();
 			}

@@ -40,8 +40,8 @@ public class EntityMapper extends AbstractMapper<Class<?>> implements IEntityMap
 	}
 	
 	@Override
-	protected void doMap() {
-		super.doMap();
+	public void init() {
+		super.init();
 		this.columns = generateColumns();
 		this.columnsMap = new HashMap<String, IColumnMapper>(this.columns.size());
 		this.primaryKey = new ArrayList<IColumnMapper>(1);
@@ -61,7 +61,7 @@ public class EntityMapper extends AbstractMapper<Class<?>> implements IEntityMap
 				if(defaultOrder == null) {
 					defaultOrder = Plum.orderBy(col.getDefaultOrderDirection(), col.getOriginal().getName());
 				} else {
-					defaultOrder.orderBy(col.getDefaultOrderDirection(), col.getName());
+					defaultOrder.orderBy(col.getDefaultOrderDirection(), col.getDestName());
 				}
 			}
 			this.columnsMap.put(col.getOriginal().getName(), col);
@@ -91,7 +91,7 @@ public class EntityMapper extends AbstractMapper<Class<?>> implements IEntityMap
 	
 	protected IColumnMapper createColumnMapper(Field field) {
 		IColumnMapper cm = new ColumnMapper(field);
-		cm.map();
+		cm.init();
 		return cm;
 	}
 	

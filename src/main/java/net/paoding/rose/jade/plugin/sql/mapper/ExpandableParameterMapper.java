@@ -21,8 +21,8 @@ public class ExpandableParameterMapper extends ParameterMapper implements IExpan
 	private List<IParameterMapper> expendedParameters;
 
 	@Override
-	public void doMap() {
-		super.doMap();
+	public void init() {
+		super.init();
 		try {
 			mapExpendedParameterMapper();
 		} catch (Exception e) {
@@ -43,7 +43,7 @@ public class ExpandableParameterMapper extends ParameterMapper implements IExpan
 
 	protected ParameterMapper createExpendedParameterMapper(IColumnMapper col) {
 		ParameterMapper expended = new ParameterMapper(this, col);
-		expended.map();
+		expended.init();
 		return expended;
 	}
 

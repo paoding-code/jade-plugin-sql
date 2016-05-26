@@ -91,7 +91,7 @@ public class ConditionalOperationMapper extends OperationMapper {
 				}
 				limitParameterIndex = index;
 			} else if(annotation.annotationType() == Where.class
-					&& OPERATION_UPDATE.equals(getName())) {
+					&& OPERATION_UPDATE.equals(getDestName())) {
 				// Where条件的位置，用于更新操作，其他操作该注解无任何意义。
 				if(index == 0) {
 					// 如果该注解被标记在第一个参数前，证明该操作没有任何值用于更新。
@@ -105,11 +105,6 @@ public class ConditionalOperationMapper extends OperationMapper {
 		return super.createParameterMapper(type, annotations, index);
 		
 		// :) Have to say, [Casablanca - Bertie Higgins] very nice!
-	}
-	
-	@Override
-	protected void doMap() {
-		super.doMap();
 	}
 	
 	public boolean containsOrder() {

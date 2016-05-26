@@ -31,7 +31,7 @@ public class UpdateGenerator extends ConditionalGenerator {
 		sql = super.beforeApplyConditions(operationMapper, runtime, sql);
 		
 		sql.append("UPDATE ");
-		sql.append(operationMapper.getTargetEntityMapper().getName());
+		sql.append(operationMapper.getTargetEntityMapper().getDestName());
 		
 		return sql;
 	}
@@ -44,7 +44,7 @@ public class UpdateGenerator extends ConditionalGenerator {
 			// 通过实体或实体集合更新
 			
 			Map<String, Object> parametersValue = runtime.getParameters();
-			if(!operationMapper.getName().equals(IOperationMapper.OPERATION_UPDATE)) {
+			if(!operationMapper.getDestName().equals(IOperationMapper.OPERATION_UPDATE)) {
 				throw new InvalidDataAccessApiUsageException("Operation mapper must be a update.");
 			}
 			
@@ -77,7 +77,7 @@ public class UpdateGenerator extends ConditionalGenerator {
 								if(p.getColumnMapper().isPrimaryKey()) {
 									// 主键视为条件
 									if(value == null) {
-										throw new IllegalArgumentException("Cannot execute update, primary key \"" + p.getColumnMapper().getName() + "\" must not be null.");
+										throw new IllegalArgumentException("Cannot execute update, primary key \"" + p.getColumnMapper().getDestName() + "\" must not be null.");
 									}
 									
 									if(where.length() > 0) {
@@ -86,9 +86,9 @@ public class UpdateGenerator extends ConditionalGenerator {
 										where.append(" WHERE ");
 									}
 									
-									where.append(p.getColumnMapper().getName());
+									where.append(p.getColumnMapper().getDestName());
 									where.append(" = :");
-									where.append(param.getName());
+									where.append(param.getDestName());
 									where.append(".");
 									where.append(p.getColumnMapper().getOriginalName());
 								} else {
@@ -96,10 +96,10 @@ public class UpdateGenerator extends ConditionalGenerator {
 											&& value == null) {
 										continue;
 									} else {
-										sql.append(p.getColumnMapper().getName());
+										sql.append(p.getColumnMapper().getDestName());
 										sql.append(" = ");
 										sql.append(":");
-										sql.append(param.getName());
+										sql.append(param.getDestName());
 										sql.append(".");
 										sql.append(p.getColumnMapper().getOriginalName());
 										sql.append(",");
@@ -133,7 +133,7 @@ public class UpdateGenerator extends ConditionalGenerator {
 				if(sql.length() == start) {
 					sql.append(" SET ");
 				}
-				sql.append(param.getName());
+				sql.append(param.getDestName());
 				sql.append(" = :");
 				sql.append(param.getOriginalName());
 				sql.append(",");

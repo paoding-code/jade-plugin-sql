@@ -33,9 +33,9 @@ public class ColumnMapper extends AbstractMapper<Field> implements IColumnMapper
 	}
 	
 	@Override
-	protected void doMap() {
+	public void init() {
 		defaultOrderDirection = annotation.order();
-		super.doMap();
+		super.init();
 	}
 	
 	@Override

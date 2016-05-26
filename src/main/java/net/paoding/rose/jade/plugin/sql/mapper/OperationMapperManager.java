@@ -28,7 +28,7 @@ public class OperationMapperManager extends AbstractCachedMapperManager<Statemen
 		}
 		
 		mapper.setEntityMapperManager(entityMapperManager);
-		mapper.map();
+		mapper.init();
 		return mapper;
 	}
 	

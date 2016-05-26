@@ -17,9 +17,8 @@ public class DeleteGenerator extends ConditionalGenerator {
 			ConditionalOperationMapper operationMapper,
 			StatementRuntime runtime, StringBuilder sql) {
 		sql = super.beforeApplyConditions(operationMapper, runtime, sql);
-		
 		sql.append("DELETE FROM ");
-		sql.append(operationMapper.getTargetEntityMapper().getName());
+		sql.append(operationMapper.getTargetEntityMapper().getDestName());
 		
 		return sql;
 	}

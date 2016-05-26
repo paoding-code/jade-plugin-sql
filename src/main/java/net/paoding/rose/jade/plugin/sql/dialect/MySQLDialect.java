@@ -19,10 +19,10 @@ import net.paoding.rose.jade.statement.StatementRuntime;
  */
 public class MySQLDialect implements IDialect {
 	
-	private Map<String, ISQLGenerator<? extends IOperationMapper>> generators;
+	private Map<String, ISQLGenerator> generators;
 	
 	public MySQLDialect() {
-		generators = new HashMap<String, ISQLGenerator<? extends IOperationMapper>>();
+		generators = new HashMap<String, ISQLGenerator>();
 		generators.put(IOperationMapper.OPERATION_SELECT, new SelectGenerator());
 		generators.put(IOperationMapper.OPERATION_INSERT, new InsertGenerator());
 		generators.put(IOperationMapper.OPERATION_UPDATE, new UpdateGenerator());
@@ -32,10 +32,9 @@ public class MySQLDialect implements IDialect {
 	/* (non-Javadoc)
 	 * @see com.cainiao.depot.project.biz.common.jade.dialect.IDialect#translate(com.cainiao.depot.project.biz.common.jade.mapper.IOperationMapper)
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends IOperationMapper> String translate(T operation, StatementRuntime runtime) {
-		ISQLGenerator<T> gen = (ISQLGenerator<T>) generators.get(operation.getName());
+	public String translate(IOperationMapper operation, StatementRuntime runtime) {
+		ISQLGenerator gen = (ISQLGenerator) generators.get(operation.getDestName());
 		if(gen != null) {
 			return gen.generate(operation, runtime);
 		}

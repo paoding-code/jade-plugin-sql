@@ -11,7 +11,7 @@ public class EntityMapperManager extends AbstractCachedMapperManager<Class<?>, I
 	
 	public IEntityMapper create(Class<?> clazz) {
 		IEntityMapper entityMapper = new EntityMapper(clazz);
-		entityMapper.map();
+		entityMapper.init();
 		return entityMapper;
 	}
 

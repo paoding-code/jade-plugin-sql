@@ -20,25 +20,20 @@ public abstract class AbstractMapper<O> implements IMapper<O> {
 	
 	private String originalName;
 	
-	private boolean mapped;
-	
 	public static final char SEPARATOR = '_';
 	
 	protected static Log logger = LogFactory.getLog(IMapper.class);
 	
 	public AbstractMapper(O original) {
 		this.original = original;
+        this.originalName = generateOriginalName();
+        this.name = generateName(getOriginalName());
 	}
+	
 
-	@Override
-	public void map() {
-		if(!mapped) {
-			this.originalName = generateOriginalName();
-			this.name = generateName(getOriginalName());
-			doMap();
-			mapped = true;
-		}
-	}
+    @Override
+    public void init() {
+    }
 	
 	public O getOriginal() {
 		return original;
@@ -82,12 +77,9 @@ public abstract class AbstractMapper<O> implements IMapper<O> {
 			throw new IllegalArgumentException("Illegal naming conventions.");
 		}
 	}
-	
-	protected void doMap() {
-		
-	};
 
-	public String getName() {
+	@Override
+	public String getDestName() {
 		return name;
 	}
 

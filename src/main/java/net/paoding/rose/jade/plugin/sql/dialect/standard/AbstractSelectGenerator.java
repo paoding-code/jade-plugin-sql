@@ -37,13 +37,13 @@ public abstract class AbstractSelectGenerator extends ConditionalGenerator {
 	protected StringBuilder beforeApplyConditions(ConditionalOperationMapper operationMapper, StatementRuntime runtime, StringBuilder sql) {
 		super.beforeApplyConditions(operationMapper, runtime, sql);
 		IEntityMapper targetEntityMapper = operationMapper.getTargetEntityMapper();
-		sql.append(operationMapper.getName());
+		sql.append(operationMapper.getDestName());
 		sql.append(" ");
 		
 		applyColumns(operationMapper, runtime, sql);
 		
 		sql.append(" FROM ");
-		sql.append(targetEntityMapper.getName());
+		sql.append(targetEntityMapper.getDestName());
 		
 		return sql;
 	}
@@ -61,7 +61,7 @@ public abstract class AbstractSelectGenerator extends ConditionalGenerator {
 		List<IColumnMapper> columns = targetEntityMapper.getColumns();
 		
 		for(IColumnMapper col : columns) {
-			String name = col.getName();
+			String name = col.getDestName();
 			sql.append(name);
 			sql.append(" ");
 			sql.append(getColumnAlias(col));
@@ -138,7 +138,7 @@ public abstract class AbstractSelectGenerator extends ConditionalGenerator {
 						
 						if(col != null) {
 							
-							sql.append(col.getName());
+							sql.append(col.getDestName());
 							sql.append(" ");
 							sql.append(DIRECTIONS.get(group.getDirection()));
 							sql.append(",");

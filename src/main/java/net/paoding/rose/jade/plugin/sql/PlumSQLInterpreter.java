@@ -39,9 +39,9 @@ import net.paoding.rose.jade.statement.StatementRuntime;
 @Order(-1)
 public class PlumSQLInterpreter implements Interpreter, InitializingBean, ApplicationContextAware {
 
-    private static final Log logger = LogFactory.getLog(PlumSQLInterpreter.class);
+    private static final Log       logger = LogFactory.getLog(PlumSQLInterpreter.class);
 
-    private ApplicationContext applicationContext;
+    private ApplicationContext     applicationContext;
 
     private OperationMapperManager operationMapperManager;
 
@@ -52,6 +52,7 @@ public class PlumSQLInterpreter implements Interpreter, InitializingBean, Applic
     public static final String ATTRIBUTE_NAME_INTERPRETER = "jade-plugin-sql.interpreter";
     
     public static final String SQL_ANNOTATION_MARKUP = "jade-plugin-sql";
+
 
     public void setDialect(IDialect dialect) {
         this.dialect = dialect;
@@ -81,10 +82,12 @@ public class PlumSQLInterpreter implements Interpreter, InitializingBean, Applic
         
         // 
         if (logger.isInfoEnabled()) {
-            String[] beanNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(//
-                applicationContext, GenericDAO.class);
-            logger.info("[jade-plugin-sql] found " + beanNames.length + " GenericDAOs: "
-                        + Arrays.toString(beanNames));
+            if (applicationContext != null) {
+                String[] beanNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(//
+                    applicationContext, GenericDAO.class);
+                logger.info("[jade-plugin-sql] found " + beanNames.length + " GenericDAOs: "
+                            + Arrays.toString(beanNames));
+            }
         }
 
     }

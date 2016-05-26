@@ -5,6 +5,9 @@ package net.paoding.rose.jade.plugin.sql.dialect.standard;
 
 import java.util.List;
 
+import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.util.CollectionUtils;
+
 import net.paoding.rose.jade.plugin.sql.dialect.ISQLGenerator;
 import net.paoding.rose.jade.plugin.sql.id.CachedIDGeneratorManager;
 import net.paoding.rose.jade.plugin.sql.id.IDGenerator;
@@ -17,17 +20,13 @@ import net.paoding.rose.jade.plugin.sql.mapper.IEntityMapper;
 import net.paoding.rose.jade.plugin.sql.mapper.IExpandableParameterMapper;
 import net.paoding.rose.jade.plugin.sql.mapper.IOperationMapper;
 import net.paoding.rose.jade.plugin.sql.mapper.IParameterMapper;
-import net.paoding.rose.jade.plugin.sql.mapper.OperationMapper;
 import net.paoding.rose.jade.statement.StatementRuntime;
-
-import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.util.CollectionUtils;
 
 /**
  * @author Alan.Geng[gengzhi718@gmail.com]
  *
  */
-public class InsertGenerator implements ISQLGenerator<OperationMapper> {
+public class InsertGenerator implements ISQLGenerator {
 	
 	private IDGeneratorManager idGeneratorManager = new CachedIDGeneratorManager();
 
@@ -35,8 +34,8 @@ public class InsertGenerator implements ISQLGenerator<OperationMapper> {
 	 * @see com.cainiao.depot.project.biz.common.jade.dialect.ISQLGenerator#generate(com.cainiao.depot.project.biz.common.jade.mapper.IOperationMapper)
 	 */
 	@Override
-	public String generate(OperationMapper operationMapper, StatementRuntime runtime) {
-		if(!operationMapper.getName().equals(IOperationMapper.OPERATION_INSERT)) {
+	public String generate(IOperationMapper operationMapper, StatementRuntime runtime) {
+        if(!operationMapper.getDestName().equals(IOperationMapper.OPERATION_INSERT)) {
 			throw new IllegalArgumentException("Operation mapper must be a insert.");
 		}
 		
@@ -54,7 +53,7 @@ public class InsertGenerator implements ISQLGenerator<OperationMapper> {
 			List<IParameterMapper> expandParams = ((IExpandableParameterMapper) entityParam).expand();
 			StringBuilder sql = new StringBuilder("INSERT INTO ");
 			StringBuilder values = new StringBuilder();
-			sql.append(targetEntityMapper.getName());
+			sql.append(targetEntityMapper.getDestName());
 			sql.append("(");
 			
 			for(IParameterMapper param : expandParams) {
@@ -83,11 +82,11 @@ public class InsertGenerator implements ISQLGenerator<OperationMapper> {
 					}
 				}
 				
-				sql.append(param.getColumnMapper().getName());
+				sql.append(param.getColumnMapper().getDestName());
 				sql.append(",");
 				
 				values.append(":");
-				values.append(entityParam.getName());
+				values.append(entityParam.getDestName());
 				values.append(".");
 				values.append(param.getColumnMapper().getOriginalName());
 				values.append(",");

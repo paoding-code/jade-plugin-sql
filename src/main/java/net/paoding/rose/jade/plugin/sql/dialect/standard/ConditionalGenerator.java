@@ -12,6 +12,7 @@ import net.paoding.rose.jade.plugin.sql.Plum.Operator;
 import net.paoding.rose.jade.plugin.sql.dialect.ISQLGenerator;
 import net.paoding.rose.jade.plugin.sql.mapper.ConditionalOperationMapper;
 import net.paoding.rose.jade.plugin.sql.mapper.IColumnMapper;
+import net.paoding.rose.jade.plugin.sql.mapper.IOperationMapper;
 import net.paoding.rose.jade.plugin.sql.mapper.IParameterMapper;
 import net.paoding.rose.jade.plugin.sql.util.PlumUtils;
 import net.paoding.rose.jade.statement.StatementRuntime;
@@ -20,7 +21,7 @@ import net.paoding.rose.jade.statement.StatementRuntime;
  * @author Alan.Geng[gengzhi718@gmail.com]
  *
  */
-public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalOperationMapper> {
+public abstract class ConditionalGenerator implements ISQLGenerator {
 
 	private static final Map<Operator, String> OPERATORS;
 	
@@ -41,11 +42,11 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 	}
 	
 	@Override
-	public String generate(ConditionalOperationMapper operationMapper, StatementRuntime runtime) {
+	public String generate(IOperationMapper operationMapper, StatementRuntime runtime) {
 		StringBuilder sql = new StringBuilder();
-		sql = beforeApplyConditions(operationMapper, runtime, sql);
-		sql = applyConditions(operationMapper, runtime, sql);
-		sql = afterApplyConditions(operationMapper, runtime, sql);
+		sql = beforeApplyConditions((ConditionalOperationMapper) operationMapper, runtime, sql);
+		sql = applyConditions((ConditionalOperationMapper) operationMapper, runtime, sql);
+		sql = afterApplyConditions((ConditionalOperationMapper) operationMapper, runtime, sql);
 		return sql.toString();
 	}
 	
@@ -60,7 +61,7 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 					sql.append(" AND ");
 				}
 				
-				sql.append(col.getName());
+				sql.append(col.getDestName());
 				sql.append(" = ");
 				sql.append(":");
 				
@@ -125,7 +126,7 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 		
 		StringBuilder sql = new StringBuilder();
 		
-		sql.append(param.getName());
+		sql.append(param.getDestName());
 		
 		if(op != Operator.LIKE
 				&& op != Operator.EQ

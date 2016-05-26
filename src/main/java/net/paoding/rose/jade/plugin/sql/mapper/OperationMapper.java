@@ -51,7 +51,7 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 	}
 
 	@Override
-	protected void doMap() {
+	public void init() {
 		ignoreNull = original.getAnnotation(IgnoreNull.class);
 		
 		if(original.getMethod().getName().startsWith("count")
@@ -85,9 +85,9 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 				|| parameterTypes.length == 0) {
 			parameters = NO_PARAMETER;
 			
-			if((getName() == OPERATION_INSERT
-					|| getName() == OPERATION_DELETE
-					|| getName() == OPERATION_UPDATE)
+			if((getDestName().equals(OPERATION_INSERT)
+					|| getDestName().equals(OPERATION_DELETE)
+					|| getDestName().equals(OPERATION_UPDATE))
 					&& parameters == NO_PARAMETER) {
 				// 写操作必须存在参数
 				throw new MappingException("The insert operation must has least 1 parameters.");
@@ -151,7 +151,7 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 			param = new ParameterMapper(this, type, annotations);
 		}
 		
-		param.map();
+		param.init();
 		
 		return param;
 	}

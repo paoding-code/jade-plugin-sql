@@ -75,8 +75,8 @@ public class ParameterMapper extends AbstractMapper<ParameterOriginal> implement
 	}
 	
 	@Override
-	protected void doMap() {
-		super.doMap();
+	public void init() {
+		super.init();
 		Annotation[] annotations = original.getAnnotations();
 		if(annotations != null && annotations.length > 0) {
 			for(Annotation annotation : annotations) {
@@ -149,11 +149,11 @@ public class ParameterMapper extends AbstractMapper<ParameterOriginal> implement
 	}
 	
 	@Override
-	public String getName() {
+	public String getDestName() {
 		if(columnMapper != null) {
-			return columnMapper.getName();
+			return columnMapper.getDestName();
 		}
-		return super.getName();
+		return super.getDestName();
 	}
 	
 }
