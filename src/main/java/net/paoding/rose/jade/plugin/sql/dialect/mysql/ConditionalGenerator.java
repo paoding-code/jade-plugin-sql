@@ -62,8 +62,12 @@ public abstract class ConditionalGenerator implements ISQLGenerator<ConditionalO
 				sql.append(" = ");
 				sql.append(":");
 				
-				// TODO:当实体为符合主键并且参数列表中的顺序与实体中字段顺序不一致，则会发生错误。
-				sql.append(i + 1);
+				// 复合主键一定要在DAO方法中的指明各个参数名，并与Bean的字段名(field.getName)一致
+				if (primaryKey.size() > 1) {
+				    sql.append(col.getOriginal().getName());
+				} else {
+				    sql.append(i + 1);
+				}
 			}
 		} else if(operationMapper.isComplexMode()) {
 			List<IParameterMapper> parameters = operationMapper.getParameters();
