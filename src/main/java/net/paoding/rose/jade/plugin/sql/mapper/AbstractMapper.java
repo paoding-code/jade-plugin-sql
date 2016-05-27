@@ -16,7 +16,7 @@ public abstract class AbstractMapper<O> implements IMapper<O> {
 	
 	protected O original;
 	
-	private String name;
+	private String destName;
 	
 	private String originalName;
 	
@@ -27,7 +27,7 @@ public abstract class AbstractMapper<O> implements IMapper<O> {
 	public AbstractMapper(O original) {
 		this.original = original;
         this.originalName = generateOriginalName();
-        this.name = generateName(getOriginalName());
+        this.destName = generateDestName(getOriginalName());
 	}
 	
 
@@ -47,7 +47,7 @@ public abstract class AbstractMapper<O> implements IMapper<O> {
 		return original.toString();
 	}
 	
-	public String generateName(String source) {
+	public String generateDestName(String source) {
 		if(PlumUtils.isBlank(source)) {
 			return null;
 		}
@@ -80,7 +80,7 @@ public abstract class AbstractMapper<O> implements IMapper<O> {
 
 	@Override
 	public String getDestName() {
-		return name;
+		return destName;
 	}
 
 }

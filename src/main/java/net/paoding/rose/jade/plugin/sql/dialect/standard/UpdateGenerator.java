@@ -61,7 +61,7 @@ public class UpdateGenerator extends ConditionalGenerator {
 				
 				if(param instanceof IExpandableParameterMapper) {
 					List<IParameterMapper> expandParams = ((IExpandableParameterMapper) param).expand();
-					Object parameterValue = parametersValue.entrySet().iterator().next().getValue();
+					Object parameterValue = parametersValue.get(":1");
 					
 					sql.append(" SET ");
 						for(IParameterMapper p : expandParams) {
@@ -87,9 +87,7 @@ public class UpdateGenerator extends ConditionalGenerator {
 									}
 									
 									where.append(p.getColumnMapper().getDestName());
-									where.append(" = :");
-									where.append(param.getDestName());
-									where.append(".");
+									where.append(" = :1.");
 									where.append(p.getColumnMapper().getOriginalName());
 								} else {
 									if(param.isIgnoreNull()
@@ -98,9 +96,7 @@ public class UpdateGenerator extends ConditionalGenerator {
 									} else {
 										sql.append(p.getColumnMapper().getDestName());
 										sql.append(" = ");
-										sql.append(":");
-										sql.append(param.getDestName());
-										sql.append(".");
+										sql.append(":1.");
 										sql.append(p.getColumnMapper().getOriginalName());
 										sql.append(",");
 									}

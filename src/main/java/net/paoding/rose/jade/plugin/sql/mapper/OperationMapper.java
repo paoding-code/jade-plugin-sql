@@ -174,7 +174,7 @@ public class OperationMapper extends AbstractMapper<StatementMetaData> implement
 	}
 	
 	@Override
-	public String generateName(String source) {
+	public String generateDestName(String source) {
 		for(int i = 0; i < OPERATION_PREFIX.length; i++) {
 			String[] prefixs = OPERATION_PREFIX[i];
 			for(int j = 0; j < prefixs.length; j++) {

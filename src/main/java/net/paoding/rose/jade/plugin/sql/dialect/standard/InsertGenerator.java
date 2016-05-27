@@ -51,8 +51,9 @@ public class InsertGenerator implements ISQLGenerator {
 		
 		if(entityParam instanceof IExpandableParameterMapper) {
 			List<IParameterMapper> expandParams = ((IExpandableParameterMapper) entityParam).expand();
-			StringBuilder sql = new StringBuilder("INSERT INTO ");
-			StringBuilder values = new StringBuilder();
+			StringBuilder sql = new StringBuilder(500);
+            StringBuilder values = new StringBuilder();
+			sql.append("INSERT INTO ");
 			sql.append(targetEntityMapper.getDestName());
 			sql.append("(");
 			
@@ -85,9 +86,7 @@ public class InsertGenerator implements ISQLGenerator {
 				sql.append(param.getColumnMapper().getDestName());
 				sql.append(",");
 				
-				values.append(":");
-				values.append(entityParam.getDestName());
-				values.append(".");
+				values.append(":1.");
 				values.append(param.getColumnMapper().getOriginalName());
 				values.append(",");
 			}
@@ -95,7 +94,7 @@ public class InsertGenerator implements ISQLGenerator {
 			values.setLength(values.length() - 1);
 			
 			sql.append(")VALUES(");
-			sql.append(values.toString());
+			sql.append(values);
 			sql.append(")");
 			
 			return sql.toString();

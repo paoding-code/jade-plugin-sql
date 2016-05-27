@@ -39,11 +39,11 @@ public class ColumnMapper extends AbstractMapper<Field> implements IColumnMapper
 	}
 	
 	@Override
-	public String generateName(String source) {
+	public String generateDestName(String source) {
 		if(PlumUtils.isNotBlank(annotation.value())) {
 			return annotation.value();
 		}
-		return super.generateName(source);
+		return super.generateDestName(source);
 	}
 
 	@SuppressWarnings("deprecation")

@@ -110,12 +110,12 @@ public class EntityMapper extends AbstractMapper<Class<?>> implements IEntityMap
 	}
 	
 	@Override
-	public String generateName(String source) {
+	public String generateDestName(String source) {
 		Table table = original.getAnnotation(Table.class);
 		if(table != null && PlumUtils.isNotBlank(table.value())) {
 			return table.value();
 		}
-		return super.generateName(source);
+		return super.generateDestName(source);
 	}
 
 	@Override

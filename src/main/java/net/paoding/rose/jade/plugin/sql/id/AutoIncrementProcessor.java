@@ -39,12 +39,10 @@ public class AutoIncrementProcessor extends DynamicReturnGeneratedKeys implement
 				IEntityMapper targetEntityMapper = operationMapper.getTargetEntityMapper();
 				
 				if(targetEntityMapper.containsAutoIncrementPrimaryKey()) {
-					String paramName = operationMapper.getParameters().get(0).getDestName();
-					
 					if(returnValue.getClass().isArray()) {
 						
 					} else {
-						Object param = runtime.getParameters().get(paramName);
+						Object param = runtime.getParameters().get(":1");
 						List<IColumnMapper> primaryKey = targetEntityMapper.getPrimaryKey();
 						IColumnMapper iColumnMapper = primaryKey.get(0);
 						try {
