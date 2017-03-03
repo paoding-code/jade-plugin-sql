@@ -38,14 +38,14 @@ jade-plugin-sql是一个 paoding-rose-jade 插件。它能够根据 DAO 方法�
 ```
 
 ### 一个基本CRUD
-首先我们需要一个DO对数据进行封装。
+首先我们需要一个实体类对数据进行封装。
 ```java
 /*
  *  当类名完全符合驼峰到下划线转换规则，可不使用@Table注解。
- *  XxxDO中的DO不会被转换到表明映射中，即：UserDO -> user。
+ *  即：User -> user。
  */
 @Table
-public class UserDO implements Serializable {
+public class User implements Serializable {
 
 	/**
 	 * 
